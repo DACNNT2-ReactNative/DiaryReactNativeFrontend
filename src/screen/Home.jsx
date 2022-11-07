@@ -2,10 +2,11 @@ import React from "react";
 import Header from "../components/Header";
 import { View, Text } from "react-native";
 import Button from "../components/Button";
-import { AuthContext } from "../contexts/AuthContext";
+import { authenticationSelectors } from "../redux/authenticate/selector";
+import { useSelector } from "react-redux";
 
 function Home() {
-  const { signOut } = React.useContext(AuthContext);
+  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Header />

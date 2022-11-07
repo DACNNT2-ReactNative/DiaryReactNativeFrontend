@@ -9,13 +9,15 @@ import TextInput from "../components/TextInput";
 import { theme } from "../core/theme";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { usernameValidator } from "../helpers/usernameValidator";
-import { AuthContext } from "../contexts/AuthContext";
+import { useDispatch } from "react-redux";
+import { actions as authActions } from "../redux/authenticate/slice";
+
+import axiosConfig from "../utils/axios";
 
 export default function Login({ navigation }) {
+  const dispatch = useDispatch();  
   const [username, setUsername] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-
-  const { signIn } = React.useContext(AuthContext);
 
   const onLoginPressed = () => {
     const userNameError = usernameValidator(username.value);
@@ -25,13 +27,21 @@ export default function Login({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-    signIn({ username, password });
+    const data = {
+      username: username.value,
+      password: password.value,
+    }
+    const response = axiosConfig.post('Authenticate/login', data)
+    response.then(data => {
+      console.log(data);
+    })
+    dispatch(authActions.setAuthenticated(true));
   };
 
   return (
     <Background>
       <Logo />
-      <Header>Nhật ký của bạn</Header>
+      <Header>Nhật ký</Header>
       <TextInput
         label="Tên đăng nhập"
         returnKeyType="next"
@@ -84,4 +94,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: theme.colors.primary,
   },
+  appTitle: {
+    color: theme.colors.primary,
+  }
 });
