@@ -9,71 +9,102 @@ import { AuthContext } from "../contexts/AuthContext";
 import Home from "../screen/Home";
 import Setting from "../screen/Setting";
 import Login from "../screen/Login";
+import { useQuery } from "react-query";
+import { getAccessToken } from "../utils/token-config";
+import { useDispatch } from "react-redux";
+import { authenticationSlice } from "../redux/authenticate/slice";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function AppNavigation() {
-  const [state, dispatch] = React.useReducer(
-    (prevState, action) => {
-      switch (action.type) {
-        case "RESTORE_TOKEN":
-          return {
-            ...prevState,
-            userToken: action.token,
-            isLoading: false,
-          };
-        case "SIGN_IN":
-          return {
-            ...prevState,
-            isSignout: false,
-            userToken: action.token,
-          };
-        case "SIGN_OUT":
-          return {
-            ...prevState,
-            isSignout: true,
-            userToken: null,
-          };
-      }
+  // const [state, dispatch] = React.useReducer(
+  //   (prevState, action) => {
+  //     switch (action.type) {
+  //       case "RESTORE_TOKEN":
+  //         return {
+  //           ...prevState,
+  //           userToken: action.token,
+  //           isLoading: false,
+  //         };
+  //       case "SIGN_IN":
+  //         return {
+  //           ...prevState,
+  //           isSignout: false,
+  //           userToken: action.token,
+  //         };
+  //       case "SIGN_OUT":
+  //         return {
+  //           ...prevState,
+  //           isSignout: true,
+  //           userToken: null,
+  //         };
+  //     }
+  //   },
+  //   {
+  //     isLoading: true,
+  //     isSignout: false,
+  //     userToken: null,
+  //   },
+  // );
+
+  // React.useEffect(() => {
+  //   const bootstrapAsync = async () => {
+  //     let userToken;
+
+  //     try {
+  //       userToken = await AsyncStorage.getItem("userToken");
+  //     } catch (e) {}
+  //     dispatch({ type: "RESTORE_TOKEN", token: userToken });
+  //   };
+
+  //   bootstrapAsync();
+  // }, []);
+
+  // const authContext = React.useMemo(
+  //   () => ({
+  //     signIn: async (data) => {
+  //       await AsyncStorage.setItem("userToken", data.username.value);
+  //       dispatch({ type: "SIGN_IN", token: data.username.value });
+  //     },
+  //     signOut: () => dispatch({ type: "SIGN_OUT" }),
+  //     signUp: async (data) => {
+  //       dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
+  //     },
+  //   }),
+  //   [],
+  // );
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
+  let accessToken = "";
+  if (getAccessToken() !== null) {
+    accessToken = getAccessToken();
+  }
+  const { data: currentUser, isLoading: isDecodingToken } = useQuery(
+    ["decodeToken", accessToken],
+    async () => {
+      const response = await axiosConfig.get("Authenticate/decode-token", { headers: { jwttoken: accessToken } });
+      dispatch(authenticationSlice.actions.setAuthenticated(true));
+      return response.data;
     },
     {
-      isLoading: true,
-      isSignout: false,
-      userToken: null,
+      onError: () => {
+        dispatch(authenticationSlice.actions.setAuthenticated(false));
+        console.log("error");
+      },
     },
   );
 
-  React.useEffect(() => {
-    const bootstrapAsync = async () => {
-      let userToken;
+  useEffect(() => {
+    if(currentUser) {
+      dispatch(authenticationSlice.actions.setUser(currentUser));
+    }
+  }, [currentUser])
 
-      try {
-        userToken = await AsyncStorage.getItem("userToken");
-      } catch (e) {}
-      dispatch({ type: "RESTORE_TOKEN", token: userToken });
-    };
-
-    bootstrapAsync();
-  }, []);
-
-  const authContext = React.useMemo(
-    () => ({
-      signIn: async (data) => {
-        await AsyncStorage.setItem("userToken", data.username.value);
-        dispatch({ type: "SIGN_IN", token: data.username.value });
-      },
-      signOut: () => dispatch({ type: "SIGN_OUT" }),
-      signUp: async (data) => {
-        dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
-      },
-    }),
-    [],
-  );
   return (
     <NavigationContainer>
-      <AuthContext.Provider value={authContext}>
-        {state.userToken !== null ? (
+      {/* <AuthContext.Provider value={authContext}> */}
+        {isAuthenticated && !isDecodingToken ? (
           <Tab.Navigator
             initialRouteName="Home"
             screenOptions={({ route }) => ({
@@ -100,7 +131,7 @@ function AppNavigation() {
             <Stack.Screen name="Login" component={Login} />
           </Stack.Navigator>
         )}
-      </AuthContext.Provider>
+      {/* </AuthContext.Provider> */}
     </NavigationContainer>
   );
 }

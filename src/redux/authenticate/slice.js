@@ -5,7 +5,6 @@ const initialUser = {
 }
 
 export const initialState = {
-    isLoading: false,
     user: initialUser,
     isAuthenticated: false,
 };
@@ -14,9 +13,6 @@ export const authenticationSlice = createSlice({
     name: 'authenticate',
     initialState,
     reducers: {
-        setIsLoading: (state, { payload }) => {
-            state.isLoading = payload;
-        },
         setUser: (state, { payload }) => {
             state.user = payload;
         },
@@ -25,5 +21,3 @@ export const authenticationSlice = createSlice({
         }
     },
 });
-
-export const { name, actions, reducer } = authenticationSlice;

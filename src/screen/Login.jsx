@@ -11,13 +11,29 @@ import { passwordValidator } from "../helpers/passwordValidator";
 import { usernameValidator } from "../helpers/usernameValidator";
 import { useDispatch } from "react-redux";
 import { actions as authActions } from "../redux/authenticate/slice";
-
 import axiosConfig from "../utils/axios";
+import { useMutation } from "react-query";
+import { setAccessToken } from "../utils/token-config";
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();  
   const [username, setUsername] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
+
+  const { mutate: login, isLoading } = useMutation(
+    (loginData) => {
+      return axiosConfig.post('Authenticate/login', loginData)
+    },
+    {
+      onSuccess: (response) => {
+        setAccessToken(response.data.token);
+        dispatch(authActions.setAuthenticated(true));        
+      },
+      onError: (error) => {
+        console.log(error);
+      }
+    }
+  );
 
   const onLoginPressed = () => {
     const userNameError = usernameValidator(username.value);
@@ -31,11 +47,7 @@ export default function Login({ navigation }) {
       username: username.value,
       password: password.value,
     }
-    const response = axiosConfig.post('Authenticate/login', data)
-    response.then(data => {
-      console.log(data);
-    })
-    dispatch(authActions.setAuthenticated(true));
+    login(data)
   };
 
   return (

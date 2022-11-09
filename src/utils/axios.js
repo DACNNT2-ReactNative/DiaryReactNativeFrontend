@@ -16,8 +16,7 @@ axiosConfig.interceptors.request.use(async (config) => {
   }
   return config;
 });
-axiosConfig.interceptors.response.use(
-  async (response) => {
+axiosConfig.interceptors.response.use(async (response) => {
     return response;
   },
   (error) => {
