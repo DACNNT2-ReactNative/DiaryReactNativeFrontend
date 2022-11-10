@@ -1,18 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../contexts/AuthContext";
 
 import Home from "../screen/Home";
 import Setting from "../screen/Setting";
 import Login from "../screen/Login";
-import { useQuery } from "react-query";
 import { getAccessToken } from "../utils/token-config";
-import { useDispatch } from "react-redux";
-import { authenticationSlice } from "../redux/authenticate/slice";
+import { useDispatch, useSelector } from "react-redux";
+import { actions as authActions } from "../redux/authenticate/slice";
+import { authenticationSelectors } from "../redux/authenticate/selector";
+import axiosConfig from "../utils/axios";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -75,62 +76,66 @@ function AppNavigation() {
   //   [],
   // );
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
-  let accessToken = "";
-  if (getAccessToken() !== null) {
-    accessToken = getAccessToken();
-  }
+  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);  
+
   const { data: currentUser, isLoading: isDecodingToken } = useQuery(
-    ["decodeToken", accessToken],
+    ["decodeToken"],
     async () => {
+      let accessToken = '';
+      const token = await getAccessToken();
+      if (token) {
+        accessToken = token;
+      }
       const response = await axiosConfig.get("Authenticate/decode-token", { headers: { jwttoken: accessToken } });
-      dispatch(authenticationSlice.actions.setAuthenticated(true));
+      dispatch(authActions.setAuthenticated(true));
       return response.data;
     },
     {
       onError: () => {
-        dispatch(authenticationSlice.actions.setAuthenticated(false));
-        console.log("error");
+        dispatch(authActions.setAuthenticated(false));
+        console.log("error decode token");
       },
     },
   );
 
+  console.log("user", currentUser);
+
   useEffect(() => {
-    if(currentUser) {
-      dispatch(authenticationSlice.actions.setUser(currentUser));
+    if (currentUser) {
+      dispatch(authActions.setUser(currentUser));
     }
-  }, [currentUser])
+  }, [currentUser]);
 
   return (
     <NavigationContainer>
       {/* <AuthContext.Provider value={authContext}> */}
-        {isAuthenticated && !isDecodingToken ? (
-          <Tab.Navigator
-            initialRouteName="Home"
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
+      {isAuthenticated && !isDecodingToken ? (
+        <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
 
-                if (route.name === "Home") {
-                  iconName = focused ? "home" : "home-outline";
-                } else if (route.name === "Setting") {
-                  iconName = focused ? "settings" : "settings-outline";
-                }
+              if (route.name === "Home") {
+                iconName = focused ? "home" : "home-outline";
+              } else if (route.name === "Setting") {
+                iconName = focused ? "settings" : "settings-outline";
+              }
 
-                return <Ionicons name={iconName} size={size} color={color} />;
-              },
-              tabBarActiveTintColor: "tomato",
-              tabBarInactiveTintColor: "gray",
-            })}
-          >
-            <Tab.Screen name="Home" component={Home} />
-            <Tab.Screen name="Setting" component={Setting} />
-          </Tab.Navigator>
-        ) : (
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={Login} />
-          </Stack.Navigator>
-        )}
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: "tomato",
+            tabBarInactiveTintColor: "gray",
+          })}
+        >
+          <Tab.Screen name="Home" component={Home} />
+          <Tab.Screen name="Setting" component={Setting} />
+        </Tab.Navigator>
+      ) : (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+        </Stack.Navigator>
+      )}
       {/* </AuthContext.Provider> */}
     </NavigationContainer>
   );

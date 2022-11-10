@@ -21,3 +21,5 @@ export const authenticationSlice = createSlice({
         }
     },
 });
+
+export const { name, actions, reducer } = authenticationSlice;

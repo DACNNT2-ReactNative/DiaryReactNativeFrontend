@@ -3,10 +3,13 @@ import Header from "../components/Header";
 import { View, Text } from "react-native";
 import Button from "../components/Button";
 import { authenticationSelectors } from "../redux/authenticate/selector";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { removeAccessToken } from "../utils/token-config";
+import { actions as authActions } from '../redux/authenticate/slice'
 
 function Home() {
-  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
+  const currentUser = useSelector(authenticationSelectors.getCurrentUser);
+  const dispatch = useDispatch();  
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Header />
@@ -14,7 +17,8 @@ function Home() {
       <Button
         mode="contained"
         onPress={() => {
-          signOut();
+          removeAccessToken();
+          dispatch(authActions.setAuthenticated(false))
         }}
       >
         Logout

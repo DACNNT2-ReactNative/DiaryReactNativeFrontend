@@ -4,14 +4,18 @@ import { Provider } from "react-native-paper";
 import { theme } from "./src/core/theme";
 import { Provider as ReduxProvider } from "react-redux";
 import store from "./src/configs/configureStore";
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./src/utils/query-client";
 
 export default function App() {
   return (
     <Provider theme={theme}>
       <StatusBar backgroundColor="#E9ECF2" barStyle="dark-content" />
-      <ReduxProvider store={store}>
-        <AppNavigation />
-      </ReduxProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReduxProvider store={store}>
+          <AppNavigation />
+        </ReduxProvider>
+      </QueryClientProvider>
     </Provider>
   );
 }

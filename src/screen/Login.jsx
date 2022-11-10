@@ -20,7 +20,7 @@ export default function Login({ navigation }) {
   const [username, setUsername] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
 
-  const { mutate: login, isLoading } = useMutation(
+  const { mutate: loginUser, isLoading } = useMutation(
     (loginData) => {
       return axiosConfig.post('Authenticate/login', loginData)
     },
@@ -30,7 +30,7 @@ export default function Login({ navigation }) {
         dispatch(authActions.setAuthenticated(true));        
       },
       onError: (error) => {
-        console.log(error);
+        console.log('error login');
       }
     }
   );
@@ -47,13 +47,14 @@ export default function Login({ navigation }) {
       username: username.value,
       password: password.value,
     }
-    login(data)
+    loginUser(data);
   };
 
   return (
     <Background>
       <Logo />
-      <Header>Nhật ký</Header>
+      {isLoading ? <Header>loading</Header> : <Header>Nhật ký</Header>}
+      
       <TextInput
         label="Tên đăng nhập"
         returnKeyType="next"
