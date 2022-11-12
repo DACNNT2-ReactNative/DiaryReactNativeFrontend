@@ -1,4 +1,4 @@
 export function usernameValidator(username) {
-    if (!username) return "Username can't be empty."
-    return ''
+  if (!username) return "Không được để trống";
+  return '';
 }

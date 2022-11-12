@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import createReducer from './rootReducer';
 
 const store = configureStore({
-  reducer: createReducer()
+  reducer: createReducer(),
 });
 
 export default store;

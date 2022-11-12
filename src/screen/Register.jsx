@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View } from 'react-native';
-import { Text, HelperText } from 'react-native-paper';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import Background from '../components/Background';
+import { HelperText } from 'react-native-paper';
 import Logo from '../components/Logo';
 import Header from '../components/Header';
 import Button from '../components/Button';
@@ -9,55 +9,69 @@ import TextInput from '../components/TextInput';
 import { theme } from '../core/theme';
 import { passwordValidator } from '../helpers/passwordValidator';
 import { usernameValidator } from '../helpers/usernameValidator';
-import { useDispatch } from 'react-redux';
 import { actions as authActions } from '../redux/authenticate/slice';
 import axiosConfig from '../utils/axios';
 import { useMutation } from 'react-query';
-import { setAccessToken } from '../utils/token-config';
 import Loading from '../components/Loading';
+import BackButton from '../components/BackButton';
 
-export default function Login({ navigation }) {
-  const dispatch = useDispatch();
+export default function Register({ navigation }) {
   const [username, setUsername] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
-  const [error, setError] = useState(null);
+  const [fullName, setFullName] = useState({ value: '', error: '' });
+  const [error, setError] = useState('');
 
-  const { mutate: loginUser, isLoading } = useMutation(
-    (loginData) => {
-      return axiosConfig.post('Authenticate/login', loginData);
+  const { mutate: registerUser, isLoading } = useMutation(
+    (registerData) => {
+      return axiosConfig.post('Authenticate/register', registerData);
     },
     {
       onSuccess: (response) => {
-        setAccessToken(response.data.token);
-        dispatch(authActions.setAuthenticated(true));
+        if (response.status === 200) {
+          navigation.replace('Login');
+        }
       },
       onError: (error) => {
-        console.log('error login', error);
+        console.log('error register', error);
         setError(error);
       },
     },
   );
 
-  const onLoginPressed = () => {
+  const onRegisterPress = () => {
     const userNameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
-    if (userNameError || passwordError) {
+    const fullNameError = usernameValidator(fullName.value);
+    if (userNameError || passwordError || fullNameError) {
       setUsername({ ...username, error: userNameError });
       setPassword({ ...password, error: passwordError });
+      setFullName({ ...fullName, error: fullNameError });
       return;
     }
     const data = {
       username: username.value,
       password: password.value,
+      fullName: fullName.value,
     };
-    loginUser(data);
+    registerUser(data);
   };
 
   return (
     <Background>
       <Logo />
-      {isLoading ? <Loading></Loading> : <Header>Nhật ký</Header>}
-
+      {isLoading ? <Loading></Loading> : <Header>Đăng kí</Header>}
+      <TextInput
+        label="Họ và tên"
+        returnKeyType="next"
+        value={fullName.value}
+        onChangeText={(text) => setFullName({ value: text, error: '' })}
+        error={!!fullName.error}
+        errorText={fullName.error}
+        autoCapitalize="none"
+        autoCompleteType="fullName"
+        textContentType="fullName"
+        keyboardType="fullName"
+      />
       <TextInput
         label="Tên đăng nhập"
         returnKeyType="next"
@@ -80,13 +94,13 @@ export default function Login({ navigation }) {
         secureTextEntry
       />
       {error ? <HelperText type="error">{error}</HelperText> : null}
-      <Button mode="contained" onPress={onLoginPressed}>
-        Đăng nhập
+      <Button mode="contained" onPress={onRegisterPress}>
+        Đăng kí
       </Button>
       <View style={styles.row}>
-        <Text>Bạn chưa có tài khoản? </Text>
-        <TouchableOpacity onPress={() => navigation.replace('Register')}>
-          <Text style={styles.link}>Đăng kí</Text>
+        <Text>Bạn đã có tài khoản? </Text>
+        <TouchableOpacity onPress={() => navigation.replace('Login')}>
+          <Text style={styles.link}>Đăng nhập</Text>
         </TouchableOpacity>
       </View>
     </Background>
@@ -94,24 +108,15 @@ export default function Login({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  forgotPassword: {
-    width: '100%',
-    alignItems: 'flex-end',
-    marginBottom: 24,
-  },
   row: {
     flexDirection: 'row',
     marginTop: 4,
   },
-  forgot: {
-    fontSize: 13,
-    color: theme.colors.secondary,
+  appTitle: {
+    color: theme.colors.primary,
   },
   link: {
     fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
-  appTitle: {
     color: theme.colors.primary,
   },
 });

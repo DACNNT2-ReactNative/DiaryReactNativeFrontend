@@ -2,12 +2,12 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { reducer as authenticateReducer } from '../redux/authenticate/slice';
 
 const createReducer = (injectedReducers = {}) => {
-    const appReducer = combineReducers({
-        authentication: authenticateReducer,
-        ...injectedReducers,
-    });
+  const appReducer = combineReducers({
+    authentication: authenticateReducer,
+    ...injectedReducers,
+  });
 
-    return appReducer;
+  return appReducer;
 };
 
 export default createReducer;
