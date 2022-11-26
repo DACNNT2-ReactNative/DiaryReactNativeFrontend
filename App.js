@@ -7,6 +7,7 @@ import store from "./src/configs/configureStore";
 import { QueryClientProvider } from "react-query";
 import { queryClient } from "./src/utils/query-client";
 
+
 export default function App() {
   return (
     <Provider theme={theme}>

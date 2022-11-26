@@ -17,6 +17,7 @@ import axiosConfig from '../utils/axios';
 import Register from '../screen/Register';
 import Loading from '../components/Loading';
 import { StyleSheet, View } from 'react-native';
+import { theme } from '../core/theme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -134,12 +135,13 @@ function AppNavigation() {
 
               return <Ionicons name={iconName} size={size} color={color} />;
             },
-            tabBarActiveTintColor: 'tomato',
+            tabBarActiveTintColor: theme.colors.primary,
             tabBarInactiveTintColor: 'gray',
+            headerTitleAlign: 'center',
           })}
         >
-          <Tab.Screen name="Home" component={Home} />
-          <Tab.Screen name="Setting" component={Setting} />
+          <Tab.Screen name="Home" options={{ title: 'Trang chủ' }} component={Home} />
+          <Tab.Screen name="Setting" options={{ title: 'Cài đặt' }} component={Setting} />
         </Tab.Navigator>
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
