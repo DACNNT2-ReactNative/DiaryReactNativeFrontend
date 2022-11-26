@@ -1,27 +1,24 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { IconButton, List, Menu } from 'react-native-paper';
+import { useQuery } from 'react-query';
+import { useDispatch, useSelector } from 'react-redux';
+import AddTopicDialog from '../components/dialogs/AddTopicDialog';
+import DeleteTopicDialog from '../components/dialogs/DeleteTopicDialog';
+import UpdateTopicDialog from '../components/dialogs/UpdateTopicDialog';
+import Loading from '../components/Loading';
 import { authenticationSelectors } from '../redux/authenticate/selector';
-import { useSelector } from 'react-redux';
-import TextInput from '../components/TextInput';
-
-import { IconButton, List, Menu, Portal, Dialog, Paragraph, Button } from 'react-native-paper';
+import { actions as topicActions } from '../redux/topic/slice';
+import axiosConfig from '../utils/axios';
+import { topicSelectors } from '../redux/topic/selector';
 
 function Home() {
+  const dispatch = useDispatch();
   const currentUser = useSelector(authenticationSelectors.getCurrentUser);
+  const topics = useSelector(topicSelectors.getTopics);
   const [showMenu, setShowMenu] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
-  const [visibleDelete, setVisibleDelete] = useState(false);
-  const [visibleAdd, setVisibleAdd] = useState(false);
-  const [visibleUpdate, setVisibleUpdate] = useState(false);
-  const [topic, setTopic] = useState([]);
-  const [topicName, setTopicName] = useState('');
 
-  const hideDialogDelete = () => setVisibleDelete(false);
-  const showDialogDelete = () => setVisibleDelete(true);
-  const hideDialogAdd = () => setVisibleAdd(false);
-  const showDialogAdd = () => setVisibleAdd(true);
-  const hideDialogUpdate = () => setVisibleUpdate(false);
-  const showDialogUpdate = () => setVisibleUpdate(true);
   const openMenu = () => setShowMenu(true);
   const closeMenu = () => setShowMenu(false);
 
@@ -36,35 +33,55 @@ function Home() {
     openMenu();
   };
 
+  const { data: topicList, isLoading: isGettingTopics } = useQuery(
+    ['topics'],
+    async () => {
+      console.log('userId', currentUser.userId);
+      const response = await axiosConfig.get('Topic/get-topics-by-user-id', { params: {userId: currentUser.userId}});
+      return response.data;
+    },
+    {
+      onError: () => {
+        console.log('error get topics');
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (topicList) {
+      dispatch(topicActions.setTopics(topicList));
+    }
+  }, [topicList]);
+
   return (
     <View style={styles.container}>
       <List.Subheader>Danh sách chủ để</List.Subheader>
-      <List.Item
-        style={styles.listItem}
-        onPress={() => console.log('Pressed')}
-        title={'Tin tức'}
-        left={() => <List.Icon icon="folder" />}
-        right={() => <IconButton onPress={onIconPress} icon="dots-vertical" />}
-      />
-      <List.Item
-        style={styles.listItem}
-        onPress={() => console.log('Pressed')}
-        title={'Tin tức'}
-        left={() => <List.Icon icon="folder" />}
-        right={() => <IconButton onPress={onIconPress} icon="dots-vertical" />}
-      />
+      {isGettingTopics ? (
+        <Loading />
+      ) : (
+        topics.map((topic) => (
+          <List.Item
+            key={topic.topicId}
+            style={styles.listItem}
+            onPress={() => console.log('Pressed')}
+            title={topic.name}
+            left={() => <List.Icon icon="folder" />}
+            right={() => <IconButton onPress={onIconPress} icon="dots-vertical" />}
+          />
+        ))
+      )}
 
       <Menu visible={showMenu} onDismiss={closeMenu} anchor={menuAnchor}>
         <Menu.Item
           onPress={() => {
-            showDialogUpdate();
+            dispatch(topicActions.setUpdateTopicDialogVisible(true));
             closeMenu();
           }}
           title="Sửa"
         />
         <Menu.Item
           onPress={() => {
-            showDialogDelete();
+            dispatch(topicActions.setDeleteTopicDialogVisible(true));
             closeMenu();
           }}
           title="Xóa"
@@ -74,69 +91,13 @@ function Home() {
         style={styles.addButton}
         icon="plus"
         onPress={() => {
-          showDialogAdd();
+          dispatch(topicActions.setAddTopicDialogVisible(true));
         }}
       />
 
-      <Portal>
-        <Dialog visible={visibleDelete} onDismiss={hideDialogDelete}>
-          <Dialog.Content>
-            <Paragraph>Bạn có muốn xóa chủ để này ?</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => console.log('Ok')}>Xác nhận</Button>
-            <Button onPress={hideDialogDelete}>Hủy</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      <Portal>
-        <Dialog visible={visibleAdd} onDismiss={hideDialogAdd}>
-          <Dialog.Content>
-            <Paragraph>Thêm chủ để</Paragraph>
-            <TextInput
-              label="Tên chủ đề"
-              returnKeyType="next"
-              value={topicName.value}
-              onChangeText={(text) => setTopicName({ value: text, error: '' })}
-              error={!!topicName.error}
-              errorText={topicName.error}
-              autoCapitalize="none"
-              autoCompleteType="topicName"
-              textContentType="topicName"
-              keyboardType="topicName"
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => console.log('Ok')}>Xác nhận</Button>
-            <Button onPress={hideDialogAdd}>Hủy</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      <Portal>
-        <Dialog visible={visibleUpdate} onDismiss={hideDialogUpdate}>
-          <Dialog.Content>
-            <Paragraph>Sửa chủ đề</Paragraph>
-            <TextInput
-              label="Tên chủ đề"
-              returnKeyType="next"
-              value={topicName.value}
-              onChangeText={(text) => setTopicName({ value: text, error: '' })}
-              error={!!topicName.error}
-              errorText={topicName.error}
-              autoCapitalize="none"
-              autoCompleteType="topicName"
-              textContentType="topicName"
-              keyboardType="topicName"
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => console.log('Ok')}>Xác nhận</Button>
-            <Button onPress={hideDialogUpdate}>Hủy</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <AddTopicDialog />
+      <UpdateTopicDialog />
+      <DeleteTopicDialog />
     </View>
   );
 }
