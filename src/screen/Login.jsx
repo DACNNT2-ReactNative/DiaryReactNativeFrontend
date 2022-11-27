@@ -27,8 +27,8 @@ export default function Login({ navigation }) {
       return axiosConfig.post('Authenticate/login', loginData);
     },
     {
-      onSuccess: (response) => {
-        setAccessToken(response.data.token);
+      onSuccess: async (response) => {
+        await setAccessToken(response.data.token);
         dispatch(authActions.setAuthenticated(true));
       },
       onError: (error) => {

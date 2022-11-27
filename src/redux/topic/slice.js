@@ -15,6 +15,22 @@ export const topicSlice = createSlice({
     setTopics: (state, { payload }) => {
       state.topics = payload;
     },
+    addTopicToTopics: (state, { payload }) => {
+      console.log(payload);
+      state.topics = [...state.topics, payload];
+    },
+    updateTopicInTopics: (state, { payload }) => {
+      console.log('payload update topic', payload);
+      const topics = state.topics;
+      topics[topics.findIndex(x => x.topicId === payload.topicId)] = payload;
+      state.topics = topics;
+    },
+    removeTopicFromTopics: (state, { payload }) => {
+      console.log(payload);
+      const topics = state.topics;
+      const topicAfterRemove = topics.filter(x => x.topicId !== payload.topicId);      
+      state.topics = topicAfterRemove;
+    },
     setTopicOnDialog: (state, { payload }) => {
       state.topicOnDialog = payload;
     },

@@ -7,6 +7,7 @@ import { actions as topicActions } from '../../redux/topic/slice';
 const DeleteTopicDialog = () => {
   const dispatch = useDispatch();
   const isDeleteTopicDialogVisible = useSelector(topicSelectors.isDeleteTopicDialogVisible);
+  const topicOnDialog = useSelector(topicSelectors.getTopicOnDialog);
 
   const hideDialogDeleteTopic = () => {
     dispatch(topicActions.setDeleteTopicDialogVisible(false));
@@ -18,7 +19,7 @@ const DeleteTopicDialog = () => {
           <Paragraph>Bạn có muốn xóa chủ để này ?</Paragraph>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => console.log('Ok')}>Xác nhận</Button>
+          <Button onPress={() => dispatch(topicActions.removeTopicFromTopics(topicOnDialog))}>Xác nhận</Button>
           <Button onPress={hideDialogDeleteTopic}>Hủy</Button>
         </Dialog.Actions>
       </Dialog>

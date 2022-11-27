@@ -18,97 +18,15 @@ import Register from '../screen/Register';
 import Loading from '../components/Loading';
 import { StyleSheet, View } from 'react-native';
 import { theme } from '../core/theme';
+import { useDecodeToken } from '../hooks/useDecodeToken';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function AppNavigation() {
-  // const [state, dispatch] = React.useReducer(
-  //   (prevState, action) => {
-  //     switch (action.type) {
-  //       case "RESTORE_TOKEN":
-  //         return {
-  //           ...prevState,
-  //           userToken: action.token,
-  //           isLoading: false,
-  //         };
-  //       case "SIGN_IN":
-  //         return {
-  //           ...prevState,
-  //           isSignout: false,
-  //           userToken: action.token,
-  //         };
-  //       case "SIGN_OUT":
-  //         return {
-  //           ...prevState,
-  //           isSignout: true,
-  //           userToken: null,
-  //         };
-  //     }
-  //   },
-  //   {
-  //     isLoading: true,
-  //     isSignout: false,
-  //     userToken: null,
-  //   },
-  // );
-
-  // React.useEffect(() => {
-  //   const bootstrapAsync = async () => {
-  //     let userToken;
-
-  //     try {
-  //       userToken = await AsyncStorage.getItem("userToken");
-  //     } catch (e) {}
-  //     dispatch({ type: "RESTORE_TOKEN", token: userToken });
-  //   };
-
-  //   bootstrapAsync();
-  // }, []);
-
-  // const authContext = React.useMemo(
-  //   () => ({
-  //     signIn: async (data) => {
-  //       await AsyncStorage.setItem("userToken", data.username.value);
-  //       dispatch({ type: "SIGN_IN", token: data.username.value });
-  //     },
-  //     signOut: () => dispatch({ type: "SIGN_OUT" }),
-  //     signUp: async (data) => {
-  //       dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
-  //     },
-  //   }),
-  //   [],
-  // );
-  const dispatch = useDispatch();
+function AppNavigation() {    
   const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
 
-  const { data: currentUser, isLoading: isDecodingToken } = useQuery(
-    ['decodeToken'],
-    async () => {
-      let accessToken = '';
-      const token = await getAccessToken();
-      if (token) {
-        accessToken = token;
-      }
-      const response = await axiosConfig.get('Authenticate/decode-token', { headers: { jwttoken: accessToken } });
-      dispatch(authActions.setAuthenticated(true));
-      return response.data;
-    },
-    {
-      onError: () => {
-        dispatch(authActions.setAuthenticated(false));
-        console.log('error decode token');
-      },
-    },
-  );
-
-  console.log('user', currentUser);
-
-  useEffect(() => {
-    if (currentUser) {
-      dispatch(authActions.setUser(currentUser));
-    }
-  }, [currentUser]);
+  const isDecodingToken = useDecodeToken();
 
   if (isDecodingToken) {
     return (
@@ -119,7 +37,6 @@ function AppNavigation() {
   }
   return (
     <NavigationContainer>
-      {/* <AuthContext.Provider value={authContext}> */}
       {isAuthenticated && !isDecodingToken ? (
         <Tab.Navigator
           initialRouteName="Home"
@@ -140,7 +57,7 @@ function AppNavigation() {
             headerTitleAlign: 'center',
           })}
         >
-          <Tab.Screen name="Home" options={{ title: 'Trang chủ' }} component={Home} />
+          <Tab.Screen name="Home" options={{ title: 'Trang chủ', unmountOnBlur: true }} component={Home} />
           <Tab.Screen name="Setting" options={{ title: 'Cài đặt' }} component={Setting} />
         </Tab.Navigator>
       ) : (
@@ -149,7 +66,6 @@ function AppNavigation() {
           <Stack.Screen name="Register" component={Register} />
         </Stack.Navigator>
       )}
-      {/* </AuthContext.Provider> */}
     </NavigationContainer>
   );
 }
