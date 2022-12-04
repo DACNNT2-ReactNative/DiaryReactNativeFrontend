@@ -29,7 +29,7 @@ const AddTopicDialog = () => {
     },
     {
       onSuccess: (response) => {
-        console.log(response.data);        
+        console.log(response.data);
         const topicAdded = {
           topicId: response.data,
           name: topicName.value,
@@ -76,14 +76,11 @@ const AddTopicDialog = () => {
           />
           {error ? <HelperText type="error">{error}</HelperText> : null}
         </Dialog.Content>
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <Dialog.Actions>
-            <Button onPress={onAddTopic}>Xác nhận</Button>
-            <Button onPress={hideDialogAddTopic}>Hủy</Button>
-          </Dialog.Actions>
-        )}
+        {isLoading ? <Loading /> : <></>}
+        <Dialog.Actions>
+          <Button onPress={onAddTopic}>Xác nhận</Button>
+          <Button onPress={hideDialogAddTopic}>Hủy</Button>
+        </Dialog.Actions>
       </Dialog>
     </Portal>
   );

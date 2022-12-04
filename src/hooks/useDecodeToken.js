@@ -12,7 +12,7 @@ export function useDecodeToken() {
     async () => {
       let accessToken = '';
       const token = await getAccessToken();
-      if (token) {
+      if (token !== null) {
         accessToken = token;
       }
       const response = await axiosConfig.get('Authenticate/decode-token', { headers: { jwttoken: accessToken } });
@@ -27,7 +27,6 @@ export function useDecodeToken() {
     },
   );
 
-  console.log('user', currentUser);
 
   useEffect(() => {
     if (currentUser) {

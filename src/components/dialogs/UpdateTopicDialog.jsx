@@ -38,7 +38,7 @@ const UpdateTopicDialog = () => {
         hideDialogUpdateTopic();
       },
       onError: (error) => {
-        console.log('error',error);
+        console.log('error', error);
         setError(error);
       },
     },
@@ -78,14 +78,11 @@ const UpdateTopicDialog = () => {
           />
           {error ? <HelperText type="error">{error}</HelperText> : null}
         </Dialog.Content>
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <Dialog.Actions>
-            <Button onPress={onUpdateTopic}>Xác nhận</Button>
-            <Button onPress={hideDialogUpdateTopic}>Hủy</Button>
-          </Dialog.Actions>
-        )}
+        {isLoading ? <Loading /> : <></>}
+        <Dialog.Actions>
+          <Button onPress={onUpdateTopic}>Xác nhận</Button>
+          <Button onPress={hideDialogUpdateTopic}>Hủy</Button>
+        </Dialog.Actions>
       </Dialog>
     </Portal>
   );

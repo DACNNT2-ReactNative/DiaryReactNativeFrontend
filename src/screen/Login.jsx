@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
-import { Text, HelperText } from 'react-native-paper';
+import { Text, HelperText, IconButton } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
 import Header from '../components/Header';
@@ -29,6 +29,8 @@ export default function Login({ navigation }) {
     {
       onSuccess: async (response) => {
         await setAccessToken(response.data.token);
+        const responseUser = await axiosConfig.get('Authenticate/decode-token', { headers: { jwttoken: response.data.token } });
+        dispatch(authActions.setUser(responseUser.data));
         dispatch(authActions.setAuthenticated(true));
       },
       onError: (error) => {
@@ -54,64 +56,117 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <Background>
-      <Logo />
-      {isLoading ? <Loading></Loading> : <Header>Nhật ký</Header>}
+    <Background
+      children={
+        <>
+          <View style={styles.headers}>
+            <Text style={styles.texHeader}>Chào mừng trở lại</Text>
+            <Text style={styles.title}>Chúng tôi rất vui được gặp lại bạn. Để sử dụng tài khoản của bạn, bạn nên đăng nhập đầu tiên.</Text>
+          </View>
+          <Header>Đăng nhập</Header>
+          <TextInput
+            label="Tên đăng nhập"
+            returnKeyType="next"
+            value={username.value}
+            onChangeText={(text) => setUsername({ value: text, error: '' })}
+            error={!!username.error}
+            errorText={username.error}
+            autoCapitalize="none"
+            autoCompleteType="username"
+            textContentType="username"
+            keyboardType="username"
+          />
+          <TextInput
+            label="Mật khẩu"
+            returnKeyType="done"
+            value={password.value}
+            onChangeText={(text) => setPassword({ value: text, error: '' })}
+            error={!!password.error}
+            errorText={password.error}
+            secureTextEntry
+          />
+          {error ? <HelperText type="error">{error}</HelperText> : null}
+          <View style={styles.forgotPassword}>
+            <TouchableOpacity onPress={() => navigation.replace('Register')}>
+              <Text style={styles.forgot}>Quên mật khẩu?</Text>
+            </TouchableOpacity>
+          </View>
+          <Button mode="contained" onPress={onLoginPressed} loading={isLoading}>
+            Đăng nhập
+          </Button>
 
-      <TextInput
-        label="Tên đăng nhập"
-        returnKeyType="next"
-        value={username.value}
-        onChangeText={(text) => setUsername({ value: text, error: '' })}
-        error={!!username.error}
-        errorText={username.error}
-        autoCapitalize="none"
-        autoCompleteType="username"
-        textContentType="username"
-        keyboardType="username"
-      />
-      <TextInput
-        label="Mật khẩu"
-        returnKeyType="done"
-        value={password.value}
-        onChangeText={(text) => setPassword({ value: text, error: '' })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
-      {error ? <HelperText type="error">{error}</HelperText> : null}
-      <Button mode="contained" onPress={onLoginPressed}>
-        Đăng nhập
-      </Button>
-      <View style={styles.row}>
-        <Text>Bạn chưa có tài khoản? </Text>
-        <TouchableOpacity onPress={() => navigation.replace('Register')}>
-          <Text style={styles.link}>Đăng kí</Text>
-        </TouchableOpacity>
-      </View>
-    </Background>
+          <Text
+            style={{
+              marginTop: 30,
+            }}
+          >
+            ------------------- Đăng nhập bằng Google ----------------
+          </Text>
+
+          <Button
+            mode="contained"
+            onPress={onLoginPressed}
+            style={{
+              backgroundColor: theme.colors.background,
+              marginTop: 20,
+              borderColor: '#E8F0F9',
+              width: '100%',
+              marginVertical: 10,
+              paddingVertical: 2,
+              borderRadius: 15,
+            }}
+            labelStyle={{
+              color: '#BFBFBF',
+              fontSize: 12,
+            }}
+          >
+            Google
+          </Button>
+
+          <View style={styles.row}>
+            <Text>Bạn chưa có tài khoản? </Text>
+            <TouchableOpacity onPress={() => navigation.replace('Register')}>
+              <Text style={styles.link}>Đăng kí</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      }
+    ></Background>
   );
 }
 
 const styles = StyleSheet.create({
+  headers: {
+    marginBottom: 20,
+    top: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  texHeader: {
+    fontSize: 24,
+    color: '#5A7EFE',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 16,
+    top: 10,
+  },
   forgotPassword: {
     width: '100%',
     alignItems: 'flex-end',
-    marginBottom: 24,
+    marginRight: 40,
+    marginBottom: 22,
   },
   row: {
     flexDirection: 'row',
-    marginTop: 4,
+    marginTop: 30,
   },
   forgot: {
     fontSize: 13,
-    color: theme.colors.secondary,
+    color: theme.colors.primary,
   },
   link: {
     fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
-  appTitle: {
     color: theme.colors.primary,
   },
 });

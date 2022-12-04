@@ -23,7 +23,7 @@ import { useDecodeToken } from '../hooks/useDecodeToken';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function AppNavigation() {    
+function AppNavigation() {
   const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
 
   const isDecodingToken = useDecodeToken();
