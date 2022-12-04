@@ -3,8 +3,18 @@ import { StyleSheet } from 'react-native';
 import { Button as PaperButton } from 'react-native-paper';
 import { theme } from '../core/theme';
 
-export default function Button({ mode, style, ...props }) {
-  return <PaperButton style={[styles.button, mode === 'outlined' && { backgroundColor: theme.colors.surface }, style]} labelStyle={styles.text} mode={mode} {...props} />;
+export default function Button({ mode, style, labelStyle, ...props }) {
+  return (
+    <PaperButton
+      loading={props.loading}
+      disabled={props.loading}
+      icon={props.icon}
+      style={[style ? style : styles.button, mode === 'outlined' && { backgroundColor: theme.colors.surface }, style]}
+      labelStyle={labelStyle ? labelStyle : styles.text}
+      mode={mode}
+      {...props}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
@@ -15,8 +25,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   text: {
-    fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 12,
     lineHeight: 26,
+    color: '#FFFFFF',
   },
 });

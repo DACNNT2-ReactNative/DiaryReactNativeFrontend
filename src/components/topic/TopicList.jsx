@@ -7,7 +7,7 @@ import Loading from '../Loading';
 import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import { topicSelectors } from '../../redux/topic/selector';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 const TopicList = () => {
   const dispatch = useDispatch();
@@ -56,28 +56,30 @@ const TopicList = () => {
   return (
     <>
       <List.Subheader>Danh sách chủ để</List.Subheader>
-      {isGettingTopics ? (
-        <Loading />
-      ) : (
-        topics.map((topic) => (
-          <List.Item
-            key={topic.topicId}
-            style={styles.listItem}
-            onPress={() => console.log('Pressed')}
-            title={topic.name}
-            left={() => <List.Icon icon="folder" />}
-            right={() => (
-              <IconButton
-                onPress={(event) => {
-                  onIconPress(event);
-                  setTopicSelected(topic);
-                }}
-                icon="dots-vertical"
-              />
-            )}
-          />
-        ))
-      )}
+      <ScrollView>
+        {isGettingTopics ? (
+          <Loading />
+        ) : (
+          topics.map((topic) => (
+            <List.Item
+              key={topic.topicId}
+              style={styles.listItem}
+              onPress={() => console.log('Pressed')}
+              title={topic.name}
+              left={() => <List.Icon icon="folder" />}
+              right={() => (
+                <IconButton
+                  onPress={(event) => {
+                    onIconPress(event);
+                    setTopicSelected(topic);
+                  }}
+                  icon="dots-vertical"
+                />
+              )}
+            />
+          ))
+        )}
+      </ScrollView>
 
       <Menu visible={showMenu} onDismiss={closeMenu} anchor={menuAnchor}>
         <Menu.Item

@@ -8,6 +8,11 @@ import RichTextEditor from '../components/diary/RichTextEditor';
 
 function Setting() {
   const dispatch = useDispatch();
+  const onLogoutPressed = async () => {
+    await removeAccessToken();
+    dispatch(authActions.setAuthenticated(false));
+    dispatch(authActions.setUser(undefined));
+  };
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <Text>Setting Screen</Text>
