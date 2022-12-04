@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import { removeAccessToken } from '../utils/token-config';
 import { actions as authActions } from '../redux/authenticate/slice';
 import { useDispatch } from 'react-redux';
+import RichTextEditor from '../components/diary/RichTextEditor';
 
 function Setting() {
   const dispatch = useDispatch();
@@ -13,11 +14,16 @@ function Setting() {
     dispatch(authActions.setUser(undefined));
   };
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: 'center' }}>
       <Text>Setting Screen</Text>
-      <Button mode="contained" onPress={onLogoutPressed}>
-        Logout
-      </Button>
+      <Button
+        mode="contained"
+        onPress={() => {
+          removeAccessToken();
+          dispatch(authActions.setAuthenticated(false))
+        }}
+      >Logout</Button>      
+      <RichTextEditor />
     </View>
   );
 }
