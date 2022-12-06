@@ -97,10 +97,17 @@ export default function Login({ navigation }) {
 
           <Text
             style={{
-              marginTop: 30,
+              marginTop: 20,
             }}
           >
-            ------------------- Đăng nhập bằng Google ----------------
+            Hoặc
+          </Text>
+          <Text
+            style={{
+              marginTop: 10,
+            }}
+          >
+            - Đăng nhập bằng Google -
           </Text>
 
           <Button

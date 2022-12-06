@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import Background from '../components/Background';
 import { HelperText } from 'react-native-paper';
 import Logo from '../components/Logo';
@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import { theme } from '../core/theme';
 import { passwordValidator } from '../helpers/passwordValidator';
-import { usernameValidator } from '../helpers/usernameValidator';
+import { fullNameValidator, usernameValidator } from '../helpers/usernameValidator';
 import { actions as authActions } from '../redux/authenticate/slice';
 import axiosConfig from '../utils/axios';
 import { useMutation } from 'react-query';
@@ -19,7 +19,6 @@ export default function Register({ navigation }) {
   const [username, setUsername] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
   const [fullName, setFullName] = useState({ value: '', error: '' });
-  const [error, setError] = useState('');
 
   const { mutate: registerUser, isLoading } = useMutation(
     (registerData) => {
@@ -29,11 +28,12 @@ export default function Register({ navigation }) {
       onSuccess: (response) => {
         if (response.status === 200) {
           navigation.replace('Login');
+          Alert.alert('', 'Chúc mừng bạn đã đăng ký tài khoản thành công')
         }
       },
       onError: (error) => {
         console.log('error register', error);
-        setError(error);
+        Alert.alert('', error);
       },
     },
   );
@@ -41,7 +41,7 @@ export default function Register({ navigation }) {
   const onRegisterPress = () => {
     const userNameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
-    const fullNameError = usernameValidator(fullName.value);
+    const fullNameError = fullNameValidator(fullName.value);
     if (userNameError || passwordError || fullNameError) {
       setUsername({ ...username, error: userNameError });
       setPassword({ ...password, error: passwordError });
@@ -98,37 +98,9 @@ export default function Register({ navigation }) {
             errorText={password.error}
             secureTextEntry
           />
-          {error ? <HelperText type="error">{error}</HelperText> : null}
           <Button mode="contained" onPress={onRegisterPress} loading={isLoading}>
             Đăng kí
-          </Button>
-
-          <Text
-            style={{
-              marginTop: 30,
-            }}
-          >
-            ------------------- Đăng kí bằng Google ----------------
-          </Text>
-
-          <Button
-            mode="contained"
-            style={{
-              backgroundColor: theme.colors.background,
-              marginTop: 20,
-              borderColor: '#E8F0F9',
-              width: '100%',
-              marginVertical: 10,
-              paddingVertical: 2,
-              borderRadius: 15,
-            }}
-            labelStyle={{
-              color: '#BFBFBF',
-              fontSize: 12,
-            }}
-          >
-            Google
-          </Button>
+          </Button>          
 
           <View style={styles.row}>
             <Text>Bạn đã có tài khoản? </Text>
