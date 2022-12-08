@@ -4,21 +4,22 @@ import { useMutation } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { usernameValidator } from '../../helpers/usernameValidator';
 import { topicSelectors } from '../../redux/topic/selector';
+import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
 import TextInput from '../TextInput';
+import { Alert } from 'react-native';
 
 const UpdateTopicDialog = () => {
   const dispatch = useDispatch();
   const [topicName, setTopicName] = useState({ value: '', error: '' });
-  const [error, setError] = useState(null);
   const isUpdateTopicDialogVisible = useSelector(topicSelectors.isUpdateTopicDialogVisible);
+  const currentUser = useSelector(authenticationSelectors.getCurrentUser);
   const topicOnDialog = useSelector(topicSelectors.getTopicOnDialog);
 
   const hideDialogUpdateTopic = () => {
     setTopicName({ value: '', error: '' });
-    setError(null);
     dispatch(topicActions.setTopicOnDialog(undefined));
     dispatch(topicActions.setUpdateTopicDialogVisible(false));
   };
@@ -30,16 +31,20 @@ const UpdateTopicDialog = () => {
     {
       onSuccess: (response) => {
         console.log(response.data);
+        const {topicId, name, userId} = response.data;
         const topicUpdate = {
-          topicId: response.data,
-          name: topicName.value,
+          topicId,
+          name,
+          userId
         };
         dispatch(topicActions.updateTopicInTopics(topicUpdate));
         hideDialogUpdateTopic();
       },
       onError: (error) => {
-        console.log('error', error);
-        setError(error);
+        if (error.title) {
+          Alert.alert('', error.title);
+        }
+        Alert.alert('', error);
       },
     },
   );
@@ -53,6 +58,7 @@ const UpdateTopicDialog = () => {
     console.log(topicOnDialog.topicId);
     const data = {
       topicId: topicOnDialog.topicId,
+      userId: currentUser.userId,
       name: topicName.value,
     };
 
@@ -76,7 +82,6 @@ const UpdateTopicDialog = () => {
             textContentType="topicName"
             keyboardType="topicName"
           />
-          {error ? <HelperText type="error">{error}</HelperText> : null}
         </Dialog.Content>
         {isLoading ? <Loading /> : <></>}
         <Dialog.Actions>

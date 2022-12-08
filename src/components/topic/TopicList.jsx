@@ -60,7 +60,7 @@ const TopicList = () => {
         {isGettingTopics ? (
           <Loading />
         ) : (
-          topics.map((topic) => (
+          [...topics].reverse().map((topic) => (
             <List.Item
               key={topic.topicId}
               style={styles.listItem}

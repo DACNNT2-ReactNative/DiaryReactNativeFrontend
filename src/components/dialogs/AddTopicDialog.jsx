@@ -9,17 +9,16 @@ import TextInput from '../TextInput';
 import { usernameValidator } from '../../helpers/usernameValidator';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
+import { Alert } from 'react-native';
 
 const AddTopicDialog = () => {
   const dispatch = useDispatch();
   const [topicName, setTopicName] = useState({ value: '', error: '' });
-  const [error, setError] = useState(null);
   const isAddTopicDialogVisible = useSelector(topicSelectors.isAddTopicDialogVisible);
   const currentUser = useSelector(authenticationSelectors.getCurrentUser);
 
   const hideDialogAddTopic = () => {
     setTopicName({ value: '', error: '' });
-    setError(null);
     dispatch(topicActions.setAddTopicDialogVisible(false));
   };
 
@@ -30,15 +29,20 @@ const AddTopicDialog = () => {
     {
       onSuccess: (response) => {
         console.log(response.data);
+        const {topicId, name, userId} = response.data;
         const topicAdded = {
-          topicId: response.data,
-          name: topicName.value,
+          topicId,
+          name,
+          userId
         };
         dispatch(topicActions.addTopicToTopics(topicAdded));
         hideDialogAddTopic();
       },
       onError: (error) => {
-        setError(error);
+        if (error.title) {
+          Alert.alert('', error.title);
+        }
+        Alert.alert('', error);
       },
     },
   );
@@ -73,8 +77,7 @@ const AddTopicDialog = () => {
             autoCompleteType="topicName"
             textContentType="topicName"
             keyboardType="topicName"
-          />
-          {error ? <HelperText type="error">{error}</HelperText> : null}
+          />          
         </Dialog.Content>
         {isLoading ? <Loading /> : <></>}
         <Dialog.Actions>

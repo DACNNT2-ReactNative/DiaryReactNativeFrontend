@@ -17,6 +17,7 @@ export const topicSlice = createSlice({
     },
     addTopicToTopics: (state, { payload }) => {
       console.log(payload);
+      console.log(state.topics);
       state.topics = [...state.topics, payload];
     },
     updateTopicInTopics: (state, { payload }) => {
@@ -26,7 +27,7 @@ export const topicSlice = createSlice({
       state.topics = topics;
     },
     removeTopicFromTopics: (state, { payload }) => {
-      console.log(payload);
+      console.log('payload delete topic',payload);
       const topics = state.topics;
       const topicAfterRemove = topics.filter(x => x.topicId !== payload.topicId);      
       state.topics = topicAfterRemove;
