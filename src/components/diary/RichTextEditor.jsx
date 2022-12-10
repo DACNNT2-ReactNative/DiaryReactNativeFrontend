@@ -70,20 +70,20 @@ const RichTextEditor = () => {
     if (imageResult.cancelled) return;
 
     if (imageResult.type !== 'image') {
-      Alert.alert('','Hình ảnh không đúng định dạng');
+      Alert.alert('', 'Hình ảnh không đúng định dạng');
       return;
     }
 
     const fileInfo = await getFileInfo(imageResult.uri);
 
     if (!fileInfo?.size) {
-      Alert.alert('','Hình ảnh không hợp lệ');
+      Alert.alert('', 'Hình ảnh không hợp lệ');
       return;
     }
 
     const isLessThan1MB = isLessThanTheMB(fileInfo.size, 1);
     if (!isLessThan1MB) {
-      Alert.alert('','Hình ảnh phải có dung lượng nhỏ hơn 1MB!');
+      Alert.alert('', 'Hình ảnh phải có dung lượng nhỏ hơn 1MB!');
       return;
     }
 

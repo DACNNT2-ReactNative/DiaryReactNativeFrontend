@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { Dialog, Paragraph, Portal, Button, HelperText } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import { Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 import { useMutation } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { usernameValidator } from '../../helpers/usernameValidator';
-import { topicSelectors } from '../../redux/topic/selector';
+import { topicNameValidator } from '../../helpers/inputValidator';
 import { authenticationSelectors } from '../../redux/authenticate/selector';
+import { topicSelectors } from '../../redux/topic/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
 import TextInput from '../TextInput';
-import { Alert, StyleSheet, View } from 'react-native';
-import { useEffect } from 'react';
 
 const UpdateTopicDialog = () => {
   const dispatch = useDispatch();
@@ -57,7 +56,7 @@ const UpdateTopicDialog = () => {
   );
 
   const onUpdateTopic = () => {
-    const topicNameError = usernameValidator(topicName.value);
+    const topicNameError = topicNameValidator(topicName.value);
     if (topicNameError) {
       setTopicName({ ...topicName, error: topicNameError });
       return;

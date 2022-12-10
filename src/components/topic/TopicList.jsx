@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IconButton, List, Menu } from 'react-native-paper';
+import { IconButton, List, Menu, Paragraph } from 'react-native-paper';
 import { useQuery } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosConfig from '../../utils/axios';
@@ -7,9 +7,11 @@ import Loading from '../Loading';
 import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import { topicSelectors } from '../../redux/topic/selector';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, Dimensions, View } from 'react-native';
 
-const TopicList = () => {
+const screen = Dimensions.get('screen');
+
+const TopicList = ({ navigation }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector(authenticationSelectors.getCurrentUser);
   const topics = useSelector(topicSelectors.getTopics);
@@ -58,22 +60,30 @@ const TopicList = () => {
   return (
     <>
       <List.Subheader>Danh sách chủ để</List.Subheader>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.list}>
         {isGettingTopics ? (
           <Loading />
         ) : (
           [...topics].reverse().map((topic) => (
-            <List.Item
-              key={topic.topicId}
-              style={styles.listItem}
-              onPress={() => console.log('Pressed')}
-              onLongPress={(event) => {
-                onIconPress(event);
-                setTopicSelected(topic);
-              }}
-              title={topic.name}
-              left={() => <List.Icon icon="folder" />}
-            />
+            <View key={topic.topicId} style={styles.listItem}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('DiaryList', { topic: topic })}
+                onLongPress={(event) => {
+                  onIconPress(event);
+                  setTopicSelected(topic);
+                }}
+              >
+                <View style={styles.topicNameBox}>
+                  <Paragraph style={styles.topicName}>{topic.name}</Paragraph>
+                </View>
+                <Image
+                  style={styles.images}
+                  source={{
+                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMgyoJg3_tdDumdqgUx-5pgCEWqTR6rQjxSg&usqp=CAU',
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
           ))
         )}
       </ScrollView>
@@ -118,13 +128,42 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   listItem: {
-    margin: 10,
+    height: (screen.width - 40) / 2,
+    width: (screen.width - 40) / 2,
+    margin: 5,
+    backgroundColor: 'transparent',
+  },
+  list: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     padding: 10,
-    backgroundColor: '#FFF',
-    width: '90%',
-    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  topicNameBox: {
+    position: 'absolute',
+    zIndex: 1,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  topicName: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 5,
+    padding: 3,
+    overflow: 'hidden',
+    fontSize: 16,
+    color: 'white',
+  },
+  images: {
+    height: (screen.width - 40) / 2,
+    width: (screen.width - 40) / 2,
+    resizeMode: 'cover',
+    position: 'relative',
     borderRadius: 10,
+    opacity: 0.9,
   },
 });
 

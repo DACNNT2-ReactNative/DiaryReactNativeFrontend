@@ -1,24 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../contexts/AuthContext';
 
-import Home from '../screen/Home';
-import Setting from '../screen/Setting';
-import Login from '../screen/Login';
-import { getAccessToken } from '../utils/token-config';
-import { useDispatch, useSelector } from 'react-redux';
-import { actions as authActions } from '../redux/authenticate/slice';
-import { authenticationSelectors } from '../redux/authenticate/selector';
-import axiosConfig from '../utils/axios';
-import Register from '../screen/Register';
-import Loading from '../components/Loading';
 import { StyleSheet, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import Loading from '../components/Loading';
 import { theme } from '../core/theme';
 import { useDecodeToken } from '../hooks/useDecodeToken';
+import { authenticationSelectors } from '../redux/authenticate/selector';
+import Home from '../screen/Home';
+import Login from '../screen/Login';
+import Register from '../screen/Register';
+import Setting from '../screen/Setting';
+import MainStackNavigator from './MainStack';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,12 +36,12 @@ function AppNavigation() {
     <NavigationContainer>
       {isAuthenticated && !isDecodingToken ? (
         <Tab.Navigator
-          initialRouteName="Home"
+          initialRouteName="HomeTab"
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
-              if (route.name === 'Home') {
+              if (route.name === 'HomeTab') {
                 iconName = focused ? 'home' : 'home-outline';
               } else if (route.name === 'Setting') {
                 iconName = focused ? 'settings' : 'settings-outline';
@@ -57,7 +54,7 @@ function AppNavigation() {
             headerTitleAlign: 'center',
           })}
         >
-          <Tab.Screen name="Home" options={{ title: 'Trang chủ', unmountOnBlur: true }} component={Home} />
+          <Tab.Screen name="HomeTab" options={{ title: 'Trang chủ' ,headerShown: false }} component={MainStackNavigator} />
           <Tab.Screen name="Setting" options={{ title: 'Cài đặt' }} component={Setting} />
         </Tab.Navigator>
       ) : (
@@ -79,3 +76,4 @@ const styles = StyleSheet.create({
 });
 
 export { AppNavigation, AuthContext };
+

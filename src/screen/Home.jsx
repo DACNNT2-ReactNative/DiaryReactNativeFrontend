@@ -4,10 +4,10 @@ import DeleteTopicDialog from '../components/dialogs/DeleteTopicDialog';
 import UpdateTopicDialog from '../components/dialogs/UpdateTopicDialog';
 import TopicList from '../components/topic/TopicList';
 
-function Home() {  
+function Home({ navigation }) {  
   return (
     <View style={styles.container}>
-      <TopicList />
+      <TopicList navigation={navigation} />
       <AddTopicDialog />
       <UpdateTopicDialog />
       <DeleteTopicDialog />
