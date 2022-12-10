@@ -38,7 +38,9 @@ const TopicList = () => {
         return;
       }
       console.log('userId', currentUser.userId);
-      const response = await axiosConfig.get('Topic/get-topics-by-user-id', { params: { userId: currentUser.userId } });
+      const response = await axiosConfig.get('Topic/get-topics-by-user-id', {
+        params: { userId: currentUser.userId },
+      });
       return response.data;
     },
     {
@@ -65,17 +67,12 @@ const TopicList = () => {
               key={topic.topicId}
               style={styles.listItem}
               onPress={() => console.log('Pressed')}
+              onLongPress={(event) => {
+                onIconPress(event);
+                setTopicSelected(topic);
+              }}
               title={topic.name}
               left={() => <List.Icon icon="folder" />}
-              right={() => (
-                <IconButton
-                  onPress={(event) => {
-                    onIconPress(event);
-                    setTopicSelected(topic);
-                  }}
-                  icon="dots-vertical"
-                />
-              )}
             />
           ))
         )}

@@ -9,7 +9,7 @@ import TextInput from '../TextInput';
 import { usernameValidator } from '../../helpers/usernameValidator';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 const AddTopicDialog = () => {
   const dispatch = useDispatch();
@@ -29,11 +29,11 @@ const AddTopicDialog = () => {
     {
       onSuccess: (response) => {
         console.log(response.data);
-        const {topicId, name, userId} = response.data;
+        const { topicId, name, userId } = response.data;
         const topicAdded = {
           topicId,
           name,
-          userId
+          userId,
         };
         dispatch(topicActions.addTopicToTopics(topicAdded));
         hideDialogAddTopic();
@@ -63,30 +63,74 @@ const AddTopicDialog = () => {
 
   return (
     <Portal>
-      <Dialog visible={isAddTopicDialogVisible} onDismiss={hideDialogAddTopic}>
+      <Dialog
+        style={styles.dialog}
+        visible={isAddTopicDialogVisible}
+        onDismiss={hideDialogAddTopic}
+      >
         <Dialog.Content>
-          <Paragraph>Thêm chủ để</Paragraph>
-          <TextInput
-            label="Tên chủ đề"
-            returnKeyType="next"
-            value={topicName.value}
-            onChangeText={(text) => setTopicName({ value: text, error: '' })}
-            error={!!topicName.error}
-            errorText={topicName.error}
-            autoCapitalize="none"
-            autoCompleteType="topicName"
-            textContentType="topicName"
-            keyboardType="topicName"
-          />          
+          <View style={styles.content}>
+            <Paragraph>Thêm chủ để</Paragraph>
+            {isLoading ? (
+              <View style={styles.loading}>
+                <Loading />
+              </View>
+            ) : (
+              <TextInput
+                label="Tên chủ đề"
+                returnKeyType="next"
+                value={topicName.value}
+                onChangeText={(text) => setTopicName({ value: text, error: '' })}
+                error={!!topicName.error}
+                errorText={topicName.error}
+                autoCapitalize="none"
+                autoCompleteType="topicName"
+                textContentType="topicName"
+                keyboardType="topicName"
+              />
+            )}
+          </View>
         </Dialog.Content>
-        {isLoading ? <Loading /> : <></>}
-        <Dialog.Actions>
-          <Button onPress={onAddTopic}>Xác nhận</Button>
-          <Button onPress={hideDialogAddTopic}>Hủy</Button>
-        </Dialog.Actions>
+        {!isLoading && (
+          <Dialog.Actions>
+            <View style={styles.actions}>
+              <View style={styles.button}>
+                <Button onPress={hideDialogAddTopic}>Hủy</Button>
+              </View>
+              <View style={styles.button}>
+                <Button onPress={onAddTopic}>Xác nhận</Button>
+              </View>
+            </View>
+          </Dialog.Actions>
+        )}
       </Dialog>
     </Portal>
   );
 };
+
+const styles = StyleSheet.create({
+  loading: {
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dialog: {
+    borderRadius: 25,
+  },
+  content: {
+    marginBottom: -20,
+  },
+  actions: {
+    width: '100%',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  button: {
+    width: '50%',
+    paddingBottom: 5,
+  },
+});
 
 export default AddTopicDialog;
