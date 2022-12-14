@@ -6,6 +6,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import store from "./src/configs/configureStore";
 import { QueryClientProvider } from "react-query";
 import { queryClient } from "./src/utils/query-client";
+import * as Linking from 'expo-linking';
 
 
 export default function App() {

@@ -15,12 +15,20 @@ import axiosConfig from '../utils/axios';
 import { useMutation } from 'react-query';
 import { setAccessToken } from '../utils/token-config';
 import Loading from '../components/Loading';
+import * as Google from 'expo-auth-session/providers/google';
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
   const [username, setUsername] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
   const [error, setError] = useState(null);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: '556329648016-t8h951d4t6jnbctfkk0ikm7cs9cuavsa.apps.googleusercontent.com',
+    // iosClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+    // androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+    // webClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+  });
 
   const { mutate: loginUser, isLoading } = useMutation(
     (loginData) => {
@@ -29,7 +37,9 @@ export default function Login({ navigation }) {
     {
       onSuccess: async (response) => {
         await setAccessToken(response.data.token);
-        const responseUser = await axiosConfig.get('Authenticate/decode-token', { headers: { jwttoken: response.data.token } });
+        const responseUser = await axiosConfig.get('Authenticate/decode-token', {
+          headers: { jwttoken: response.data.token },
+        });
         dispatch(authActions.setUser(responseUser.data));
         dispatch(authActions.setAuthenticated(true));
       },
@@ -55,13 +65,33 @@ export default function Login({ navigation }) {
     loginUser(data);
   };
 
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      console.log('authentication', authentication);
+      fetch('https://www.googleapis.com/userinfo/v2/me', {
+        headers: { Authorization: `Bearer ${authentication.accessToken}` },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [response]);
+
   return (
     <Background
       children={
         <>
           <View style={styles.headers}>
             <Text style={styles.texHeader}>Chào mừng trở lại</Text>
-            <Text style={styles.title}>Chúng tôi rất vui được gặp lại bạn. Để sử dụng tài khoản của bạn, bạn nên đăng nhập đầu tiên.</Text>
+            <Text style={styles.title}>
+              Chúng tôi rất vui được gặp lại bạn. Để sử dụng tài khoản của bạn, bạn nên đăng nhập
+              đầu tiên.
+            </Text>
           </View>
           <Header>Đăng nhập</Header>
           <TextInput
@@ -112,7 +142,10 @@ export default function Login({ navigation }) {
 
           <Button
             mode="contained"
-            onPress={onLoginPressed}
+            disabled={!request}
+            onPress={() => {
+              promptAsync();
+            }}
             style={{
               backgroundColor: theme.colors.background,
               marginTop: 20,
