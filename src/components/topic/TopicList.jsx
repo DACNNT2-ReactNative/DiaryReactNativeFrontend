@@ -8,6 +8,7 @@ import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import { topicSelectors } from '../../redux/topic/selector';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, Dimensions, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 
 const screen = Dimensions.get('screen');
 
@@ -18,6 +19,7 @@ const TopicList = ({ navigation }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [topicSelected, setTopicSelected] = useState(undefined);
+  const isFocused = useIsFocused();
 
   const openMenu = () => setShowMenu(true);
   const closeMenu = () => setShowMenu(false);
@@ -33,7 +35,7 @@ const TopicList = ({ navigation }) => {
     openMenu();
   };
 
-  const { data: topicList, isLoading: isGettingTopics } = useQuery(
+  const { data: topicList, isLoading: isGettingTopics, refetch } = useQuery(
     ['topics'],
     async () => {
       if (currentUser === undefined) {
@@ -53,10 +55,13 @@ const TopicList = ({ navigation }) => {
   );
 
   useEffect(() => {
-    if (topicList) {
+    // if(isFocused){
+    //   refetch();
+    // }
+    if (topicList && isFocused) {
       dispatch(topicActions.setTopics(topicList));
     }
-  }, [topicList]);
+  }, [topicList, isFocused]);
   return (
     <>
       <List.Subheader>Danh sách chủ để</List.Subheader>
@@ -122,10 +127,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    width: 70,
-    height: 70,
-    backgroundColor: '#FFF',
+    width: 60,
+    height: 60,
+    backgroundColor: '#f7efef',
     borderRadius: 50,
+    borderWidth: 1,
   },
   listItem: {
     height: (screen.width - 40) / 2,

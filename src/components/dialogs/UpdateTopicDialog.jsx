@@ -49,8 +49,9 @@ const UpdateTopicDialog = () => {
       onError: (error) => {
         if (error.title) {
           Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
         }
-        Alert.alert('', error);
       },
     },
   );
@@ -63,7 +64,6 @@ const UpdateTopicDialog = () => {
     }
     console.log(topicOnDialog.topicId);
     const data = {
-      topicId: topicOnDialog.topicId,
       userId: currentUser.userId,
       name: topicName.value,
     };

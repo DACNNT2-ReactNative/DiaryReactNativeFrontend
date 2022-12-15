@@ -8,4 +8,10 @@ const isDeleteTopicDialogVisible = (state) => state?.topic?.isDeleteTopicDialogV
 
 const getTopicOnDialog = (state) => state.topic?.topicOnDialog;
 
-export const topicSelectors = { getTopics, isAddTopicDialogVisible, isUpdateTopicDialogVisible, isDeleteTopicDialogVisible, getTopicOnDialog };
+export const topicSelectors = {
+  getTopics,
+  isAddTopicDialogVisible,
+  isUpdateTopicDialogVisible,
+  isDeleteTopicDialogVisible,
+  getTopicOnDialog,
+};

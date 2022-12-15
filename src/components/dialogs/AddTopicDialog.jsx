@@ -41,8 +41,9 @@ const AddTopicDialog = () => {
       onError: (error) => {
         if (error.title) {
           Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
         }
-        Alert.alert('', error);
       },
     },
   );
