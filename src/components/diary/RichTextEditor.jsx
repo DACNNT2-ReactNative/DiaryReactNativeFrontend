@@ -4,14 +4,23 @@ import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'
 import * as ImagePicker from 'expo-image-picker';
 import axiosConfig from '../../utils/axios';
 import { getFileInfo, isLessThanTheMB } from '../../utils/checkFileSize';
+import { useDispatch, useSelector } from 'react-redux';
+import { diarySelectors } from '../../redux/diary/selector';
+import { actions as diaryActions } from '../../redux/diary/slice';
+import { useEffect } from 'react';
+import { useMutation } from 'react-query';
+import { getTitleFromContent } from '../../utils/getTitleFromContent';
+import { IconButton, Paragraph } from 'react-native-paper';
+import Loading from '../Loading';
 
 const screen = Dimensions.get('screen');
 
-const RichTextEditor = () => {
+const RichTextEditor = ({ diary, navigation }) => {
   const richText = useRef();
-  const [contentHtml, setContentHtml] = useState(
-    '<div>ùcuc uvigig ugigiv gvuv</div><div>uviviv hhhh<img src="https://i.pinimg.com/originals/6f/5a/34/6f5a34181beb2c2de8185d39255ad08a.jpg" style="font-size: 1em;"></div>',
-  );
+  const dispatch = useDispatch();
+  const [textHtml, setTextHtml] = useState('');
+  const [timeUpdated, setTimeUpdated] = useState(diary.updateAt);
+  const editingDiary = useSelector(diarySelectors.getCurrentEditingDiary);
 
   const pickImage = async () => {
     const gallery = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -96,9 +105,69 @@ const RichTextEditor = () => {
     richText.current.insertImage(response.data);
   };
 
+  const { mutate: updateDiary, isLoading: isUpdating } = useMutation(
+    (diary) => {
+      return axiosConfig.put('Diary/update-diary', diary);
+    },
+    {
+      onSuccess: (response) => {
+        console.log('updated', response.data);
+        setTimeUpdated(response.data.updateAt)
+        dispatch(diaryActions.updateDiaryInDiaries(response.data));
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    },
+  );
+
+  const { mutate: saveDiary, isLoading: isSaving } = useMutation(
+    (diary) => {
+      return axiosConfig.put('Diary/update-diary', diary);
+    },
+    {
+      onSuccess: (response) => {
+        console.log('updated', response.data);
+        dispatch(diaryActions.updateDiaryInDiaries(response.data));
+        navigation.goBack();
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    },
+  );
+
   const richTextHandle = (descriptionText) => {
-    console.log(descriptionText);
+    setTextHtml(descriptionText);
+    console.log('content', descriptionText);
   };
+
+  useEffect(() => {
+    const title = getTitleFromContent(textHtml);
+    console.log('title', title);
+    const updatedDiary = {
+      diaryId: diary.diaryId,
+      content: textHtml,
+      title: title,
+    };
+    const timer = setTimeout(() => {
+      updateDiary(updatedDiary);
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [textHtml]);
+
+  const onSave = () => {
+    const title = getTitleFromContent(textHtml);
+    const updatedDiary = {
+      diaryId: diary.diaryId,
+      content: textHtml,
+      title: title,
+    };
+    saveDiary(updatedDiary);
+  }
 
   return (
     <View style={styles.richTextContainer}>
@@ -106,17 +175,26 @@ const RichTextEditor = () => {
         <RichEditor
           ref={richText}
           onChange={richTextHandle}
-          placeholder="Write your cool content here :)"
+          placeholder="Tiêu đề"
           androidHardwareAccelerationDisabled={true}
           style={styles.richTextEditorStyle}
           initialHeight={screen.height - 70}
-          initialContentHTML={contentHtml}
+          initialContentHTML={diary.content ? diary.content : ''}
         />
       </ScrollView>
+      <IconButton
+        style={styles.saveButton}
+        icon="content-save-edit"
+        onPress={() => {
+          console.log('click')
+          onSave();
+        }}
+      />
+      <Paragraph style={styles.lastSave}>Chỉnh sửa lần cuối: {isUpdating ? '...' : timeUpdated}</Paragraph>
       <RichToolbar
         editor={richText}
-        selectedIconTint="#dcf51d"
-        iconTint="#90dc7b"
+        selectedIconTint="#fe4141"
+        iconTint="#e751d5"
         actions={[
           actions.undo,
           actions.insertVideo,
@@ -143,24 +221,30 @@ const styles = StyleSheet.create({
     flexDirection: 'column-reverse',
     width: '100%',
   },
-
   richTextEditorStyle: {
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
     fontSize: 20,
   },
-
+  saveButton: {
+    position: 'absolute',
+    zIndex: 10,
+    top: 45,
+    right: 5,
+    width: 25,
+    height: 25,
+    borderRadius: 5,
+    borderWidth: 1,
+  },
   richTextToolbarStyle: {
     backgroundColor: '#c6c3b3',
     borderColor: '#c6c3b3',
-    borderRadius: 10,
     borderWidth: 1,
     color: '#fff',
   },
+  lastSave: {
+    marginTop: 10,
+    fontSize: 12,
+    marginBottom: 10
+  }
 });
 
 export default RichTextEditor;

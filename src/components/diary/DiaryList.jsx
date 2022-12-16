@@ -32,12 +32,7 @@ const DiaryList = (props) => {
       const response = await axiosConfig.get('Diary/get-diaries-by-topic-id', {
         params: { topicId: props.topic.topicId },
       });
-      response.data.map((diary) => {
-        console.log('delete',diary)
-        if (!diary.content) {
-          deleteEmptyDiary(diary.diaryId);
-        }
-      });
+      console.log('get diaries res', response.data);
       return response.data;
     },
     {
@@ -47,32 +42,27 @@ const DiaryList = (props) => {
     },
   );
 
-  const { mutate: deleteEmptyDiary } = useMutation(
-    (diaryId) => {
-      console.log(diaryId);
-      return axiosConfig.delete('Diary/delete-diary-by-id', { params: { diaryId: diaryId } });
-    },
-    {
-      onSuccess: (response) => {
-        console.log(response.data);
-        dispatch(diaryActions.removeDiaryFromList({ diaryId: response.data }));
-      },
-      onError: (error) => {
-        console.log(error);
-      },
-    },
-  );
+  console.log('get diaries', diaryList);
 
   useEffect(() => {
-    // if (isFocused && diaryList.length > 0) {
-    //   console.log(isFocused)
-    //   refetch();
-    // }    
-    if (diaryList && isFocused) {
-      console.log('list',diaryList);
-      dispatch(diaryActions.setDiaries(diaryList));      
+    if (isFocused) {
+      refetch();
+      diaries.map((diary) => {
+        setTimeout(() => {
+          if(!diary.content || diary.content === ''){
+            dispatch(diaryActions.removeDiaryFromList(diary));
+          }
+        }, 800);      
+      });
     }
-  }, [diaryList, isFocused]);
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (diaryList && isFocused) {
+      console.log('list', diaryList);
+      dispatch(diaryActions.setDiaries(diaryList));
+    }
+  }, [diaryList]);
 
   if (isGettingDiaries) {
     return (
@@ -83,12 +73,7 @@ const DiaryList = (props) => {
   }
 
   const source = {
-    html: `
-    <div style="color: purple; font-size: 1rem;">ùcuc uvigig ugigiv gvuv</div>
-  <p style='text-align:center;'>
-    Hello World!
-  </p>
-  `,
+    html: '',
   };
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
@@ -97,9 +82,9 @@ const DiaryList = (props) => {
         whiteSpace: 'normal',
         color: 'gray',
       },
-      p: {
-        color: 'green',
-      },
+      div: {
+        fontSize: '8px',
+      }
     };
     return <RenderHTML contentWidth={width} source={{ html: content }} tagsStyles={tagsStyles} />;
   });
@@ -107,8 +92,8 @@ const DiaryList = (props) => {
   return (
     <ScrollView contentContainerStyle={styles.list}>
       {diaries.map((diary) => (
-        <TouchableOpacity key={diary.id} style={styles.listItem}>
-          <WebDisplay content={source.html} />
+        <TouchableOpacity key={diary.diaryId} style={styles.listItem}>
+          <WebDisplay content={diary.content ? diary.content : source.html} />
         </TouchableOpacity>
       ))}
     </ScrollView>

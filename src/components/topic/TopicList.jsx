@@ -35,7 +35,11 @@ const TopicList = ({ navigation }) => {
     openMenu();
   };
 
-  const { data: topicList, isLoading: isGettingTopics, refetch } = useQuery(
+  const {
+    data: topicList,
+    isLoading: isGettingTopics,
+    refetch,
+  } = useQuery(
     ['topics'],
     async () => {
       if (currentUser === undefined) {
@@ -55,16 +59,14 @@ const TopicList = ({ navigation }) => {
   );
 
   useEffect(() => {
-    // if(isFocused){
-    //   refetch();
-    // }
-    if (topicList && isFocused) {
+    if (topicList) {
       dispatch(topicActions.setTopics(topicList));
     }
-  }, [topicList, isFocused]);
+  }, [topicList]);
+
   return (
     <>
-      <List.Subheader>Danh sách chủ để</List.Subheader>
+      <List.Subheader>Danh sách chủ đề</List.Subheader>
       <ScrollView contentContainerStyle={styles.list}>
         {isGettingTopics ? (
           <Loading />

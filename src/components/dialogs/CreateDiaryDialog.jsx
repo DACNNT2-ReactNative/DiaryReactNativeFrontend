@@ -2,7 +2,6 @@ import React from 'react';
 import { Alert, Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Dialog, IconButton, Paragraph, Portal } from 'react-native-paper';
 import { diarySelectors } from '../../redux/diary/selector';
-import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions as diaryActions } from '../../redux/diary/slice';
 import { useMutation } from 'react-query';
@@ -12,9 +11,9 @@ import Loading from '../Loading';
 const screen = Dimensions.get('screen');
 
 const CreateDiaryDialog = (props) => {
+  const { navigation, topic } = props;
   const dispatch = useDispatch();
   const isCreateDiaryDialogVisible = useSelector(diarySelectors.isCreateDiaryDialogVisible);
-  const currentUser = useSelector(authenticationSelectors.getCurrentUser);
 
   const hideDialogCreateDiary = () => {
     dispatch(diaryActions.setCreateDiaryDialogVisible(false));
@@ -27,8 +26,9 @@ const CreateDiaryDialog = (props) => {
     },
     {
       onSuccess: (response) => {
-        console.log(response.data);
-        dispatch(diaryActions.addDiaryToDiaries({ diaryId: response.data, content: null }));
+        console.log('create diary', response.data);
+        navigation.navigate('DiaryEdit', { diary: response.data });
+        dispatch(diaryActions.addDiaryToDiaries(response.data));
         hideDialogCreateDiary();
       },
       onError: (error) => {
@@ -44,8 +44,8 @@ const CreateDiaryDialog = (props) => {
   const onCreateDiary = (type) => {
     console.log(type);
     const diary = {
-      userId: props.topic.userId,
-      topicId: props.topic.topicId,
+      userId: topic.userId,
+      topicId: topic.topicId,
       type: type,
     };
     createDiary(diary);

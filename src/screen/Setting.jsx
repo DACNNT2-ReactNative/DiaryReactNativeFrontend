@@ -4,7 +4,6 @@ import Button from '../components/Button';
 import { removeAccessToken } from '../utils/token-config';
 import { actions as authActions } from '../redux/authenticate/slice';
 import { useDispatch } from 'react-redux';
-import RichTextEditor from '../components/diary/RichTextEditor';
 
 function Setting() {
   const dispatch = useDispatch();
@@ -22,8 +21,7 @@ function Setting() {
           removeAccessToken();
           dispatch(authActions.setAuthenticated(false))
         }}
-      >Logout</Button>      
-      <RichTextEditor />
+      >Logout</Button>            
     </View>
   );
 }
