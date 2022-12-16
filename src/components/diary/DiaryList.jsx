@@ -16,6 +16,7 @@ import { TouchableOpacity } from 'react-native';
 import { Paragraph } from 'react-native-paper';
 import { getFullDate } from '../../utils/converDateTime';
 import { shortenTitle } from '../../utils/checkTitle';
+import { SharedElement } from 'react-navigation-shared-element';
 
 const screen = Dimensions.get('screen');
 
@@ -89,19 +90,29 @@ const DiaryList = ({ topic, navigation }) => {
         fontSize: '5px',
       },
     };
-    return <RenderHTML contentWidth={width} source={{ html: content }} tagsStyles={tagsStyles} />;
+    return (
+      <RenderHTML
+        enableExperimentalBRCollapsing={true}
+        contentWidth={width}
+        source={{ html: content }}
+        tagsStyles={tagsStyles}
+      />
+    );
   });
 
   return (
     <ScrollView contentContainerStyle={styles.list}>
       {diaries.map((diary) => (
         <View style={styles.listItemContainer} key={diary.diaryId}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('DiaryEdit', { diary: diary })}
-            style={styles.listItem}
-          >
-            <WebDisplay content={diary.content ? diary.content : source.html} />
-          </TouchableOpacity>
+          <SharedElement id={diary.diaryId}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('DiaryEdit', { diary: diary })}
+              onLongPress={() => navigation.navigate('DiaryOption', { diary: diary })}
+              style={styles.listItem}
+            >
+              <WebDisplay content={diary.content ? diary.content : source.html} />
+            </TouchableOpacity>
+          </SharedElement>
           <View style={styles.title}>
             <WebDisplay content={diary.title ? shortenTitle(diary.title) : source.html} />
             <Paragraph style={styles.createAt}>{getFullDate(diary.createAt)}</Paragraph>
@@ -126,6 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbead1',
     borderRadius: 7,
     padding: 10,
+    overflow: 'hidden',
   },
   title: {
     marginBottom: 20,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Alert } from 'react-native';
 import { Text, HelperText, IconButton } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -45,7 +45,11 @@ export default function Login({ navigation }) {
       },
       onError: (error) => {
         console.log('error login', error);
-        setError(error);
+        if (error.title) {
+          Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
+        }
       },
     },
   );

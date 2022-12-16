@@ -64,6 +64,7 @@ const UpdateTopicDialog = () => {
     }
     console.log(topicOnDialog.topicId);
     const data = {
+      topicId: topicOnDialog.topicId,
       userId: currentUser.userId,
       name: topicName.value,
     };

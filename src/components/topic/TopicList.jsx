@@ -66,12 +66,11 @@ const TopicList = ({ navigation }) => {
 
   return (
     <>
-      <List.Subheader>Danh sách chủ đề</List.Subheader>
       <ScrollView contentContainerStyle={styles.list}>
         {isGettingTopics ? (
           <Loading />
         ) : (
-          [...topics].reverse().map((topic) => (
+          [...topics].reverse().map((topic, index) => (
             <View key={topic.topicId} style={styles.listItem}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('DiaryList', { topic: topic })}
@@ -86,7 +85,7 @@ const TopicList = ({ navigation }) => {
                 <Image
                   style={styles.images}
                   source={{
-                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMgyoJg3_tdDumdqgUx-5pgCEWqTR6rQjxSg&usqp=CAU',
+                    uri: `https://source.unsplash.com/random/200x200?${index}`,
                   }}
                 />
               </TouchableOpacity>
@@ -113,28 +112,11 @@ const TopicList = ({ navigation }) => {
           title="Xóa"
         />
       </Menu>
-      <IconButton
-        style={styles.addButton}
-        icon="plus"
-        onPress={() => {
-          dispatch(topicActions.setAddTopicDialogVisible(true));
-        }}
-      />
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  addButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    backgroundColor: '#f7efef',
-    borderRadius: 50,
-    borderWidth: 1,
-  },
   listItem: {
     height: (screen.width - 40) / 2,
     width: (screen.width - 40) / 2,
@@ -146,6 +128,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     padding: 10,
     justifyContent: 'center',
+    marginTop: 10,
   },
   topicNameBox: {
     position: 'absolute',

@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../contexts/AuthContext';
@@ -16,9 +15,10 @@ import Login from '../screen/Login';
 import Register from '../screen/Register';
 import Setting from '../screen/Setting';
 import MainStackNavigator from './MainStack';
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createSharedElementStackNavigator();
 
 function AppNavigation() {
   const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
@@ -35,28 +35,7 @@ function AppNavigation() {
   return (
     <NavigationContainer>
       {isAuthenticated && !isDecodingToken ? (
-        <Tab.Navigator
-          initialRouteName="HomeTab"
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
-
-              if (route.name === 'HomeTab') {
-                iconName = focused ? 'home' : 'home-outline';
-              } else if (route.name === 'Setting') {
-                iconName = focused ? 'settings' : 'settings-outline';
-              }
-
-              return <Ionicons name={iconName} size={size} color={color} />;
-            },
-            tabBarActiveTintColor: theme.colors.primary,
-            tabBarInactiveTintColor: 'gray',
-            headerTitleAlign: 'center',
-          })}
-        >
-          <Tab.Screen name="HomeTab" options={{ title: 'Trang chủ' ,headerShown: false }} component={MainStackNavigator} />
-          <Tab.Screen name="Setting" options={{ title: 'Cài đặt' }} component={Setting} />
-        </Tab.Navigator>
+        <MainStackNavigator />
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
@@ -76,4 +55,3 @@ const styles = StyleSheet.create({
 });
 
 export { AppNavigation, AuthContext };
-

@@ -234,8 +234,6 @@ const styles = StyleSheet.create({
     right: 5,
     width: 25,
     height: 25,
-    borderRadius: 5,
-    borderWidth: 1,
   },
   richTextToolbarStyle: {
     backgroundColor: '#c6c3b3',

@@ -1,4 +1,7 @@
 export const getTitleFromContent = (contentHtml) => {
+  if (contentHtml === null) {
+    return 'New Diary';
+  }
   let title;
   let resultTitle;
 
