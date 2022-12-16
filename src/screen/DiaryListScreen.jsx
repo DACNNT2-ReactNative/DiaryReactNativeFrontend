@@ -13,8 +13,8 @@ const DiaryListScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>      
-      <DiaryList topic={topic} />
-      <CreateDiaryDialog topic={topic} navigation={navigation}/>
+      <DiaryList topic={topic} navigation={navigation} />
+      <CreateDiaryDialog topic={topic} navigation={navigation} />
     </View>
   );
 };

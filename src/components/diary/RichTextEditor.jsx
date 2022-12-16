@@ -12,13 +12,14 @@ import { useMutation } from 'react-query';
 import { getTitleFromContent } from '../../utils/getTitleFromContent';
 import { IconButton, Paragraph } from 'react-native-paper';
 import Loading from '../Loading';
+import { getFullDateAndTime, getFullTime } from '../../utils/converDateTime';
 
 const screen = Dimensions.get('screen');
 
 const RichTextEditor = ({ diary, navigation }) => {
   const richText = useRef();
   const dispatch = useDispatch();
-  const [textHtml, setTextHtml] = useState('');
+  const [textHtml, setTextHtml] = useState(diary.content);
   const [timeUpdated, setTimeUpdated] = useState(diary.updateAt);
   const editingDiary = useSelector(diarySelectors.getCurrentEditingDiary);
 
@@ -112,7 +113,7 @@ const RichTextEditor = ({ diary, navigation }) => {
     {
       onSuccess: (response) => {
         console.log('updated', response.data);
-        setTimeUpdated(response.data.updateAt)
+        setTimeUpdated(response.data.updateAt);
         dispatch(diaryActions.updateDiaryInDiaries(response.data));
       },
       onError: (error) => {
@@ -167,7 +168,7 @@ const RichTextEditor = ({ diary, navigation }) => {
       title: title,
     };
     saveDiary(updatedDiary);
-  }
+  };
 
   return (
     <View style={styles.richTextContainer}>
@@ -186,11 +187,13 @@ const RichTextEditor = ({ diary, navigation }) => {
         style={styles.saveButton}
         icon="content-save-edit"
         onPress={() => {
-          console.log('click')
+          console.log('click');
           onSave();
         }}
       />
-      <Paragraph style={styles.lastSave}>Chỉnh sửa lần cuối: {isUpdating ? '...' : timeUpdated}</Paragraph>
+      <Paragraph style={styles.lastSave}>
+        Chỉnh sửa lần cuối vào {isUpdating ? '...' : getFullDateAndTime(timeUpdated)}
+      </Paragraph>
       <RichToolbar
         editor={richText}
         selectedIconTint="#fe4141"
@@ -243,8 +246,9 @@ const styles = StyleSheet.create({
   lastSave: {
     marginTop: 10,
     fontSize: 12,
-    marginBottom: 10
-  }
+    marginBottom: 10,
+    marginLeft: 10,
+  },
 });
 
 export default RichTextEditor;
