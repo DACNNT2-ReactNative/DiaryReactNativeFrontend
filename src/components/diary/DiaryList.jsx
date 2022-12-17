@@ -62,7 +62,7 @@ const DiaryList = ({ topic, navigation }) => {
   }, [isFocused]);
 
   useEffect(() => {
-    if (diaryList && isFocused) {
+    if (diaryList) {
       //console.log('list', diaryList);
       dispatch(diaryActions.setDiaries(diaryList));
     }
@@ -87,12 +87,41 @@ const DiaryList = ({ topic, navigation }) => {
         color: 'gray',
       },
       div: {
-        fontSize: '5px',
+        fontSize: '3px',
+      },
+      p: {
+        fontSize: '3px',
       },
     };
     return (
       <RenderHTML
         enableExperimentalBRCollapsing={true}
+        enableExperimentalMarginCollapsing={true}
+        contentWidth={width}
+        source={{ html: content }}
+        tagsStyles={tagsStyles}
+      />
+    );
+  });
+
+  const TitleDisplay = React.memo(function WebDisplay({ content }) {
+    const tagsStyles = {
+      body: {
+        whiteSpace: 'normal',
+        color: 'gray',
+        textAlign: 'center',
+      },
+      div: {
+        fontSize: '14px',
+      },
+      p: {
+        fontSize: '14px',
+      },
+    };
+    return (
+      <RenderHTML
+        enableExperimentalBRCollapsing={true}
+        enableExperimentalMarginCollapsing={true}
         contentWidth={width}
         source={{ html: content }}
         tagsStyles={tagsStyles}
@@ -114,9 +143,9 @@ const DiaryList = ({ topic, navigation }) => {
             </TouchableOpacity>
           </SharedElement>
           <View style={styles.title}>
-            <WebDisplay content={diary.title ? shortenTitle(diary.title) : source.html} />
-            <Paragraph style={styles.createAt}>{getFullDate(diary.createAt)}</Paragraph>
+            <TitleDisplay content={shortenTitle(diary.content)} />
           </View>
+          <Paragraph style={styles.createAt}>{getFullDate(diary.createAt)}</Paragraph>
         </View>
       ))}
     </ScrollView>
@@ -126,6 +155,8 @@ const DiaryList = ({ topic, navigation }) => {
 const styles = StyleSheet.create({
   loading: {
     height: screen.height,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   listItemContainer: {
     alignItems: 'center',
@@ -140,11 +171,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   title: {
-    marginBottom: 20,
+    height: 16,
+    width: (screen.width - 120) / 3,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   createAt: {
     fontSize: 10,
+    marginBottom: 20,
   },
   list: {
     flexDirection: 'row',

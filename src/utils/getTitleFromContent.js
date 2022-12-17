@@ -2,15 +2,23 @@ export const getTitleFromContent = (contentHtml) => {
   if (contentHtml === null) {
     return 'New Diary';
   }
+  
   let title;
   let resultTitle;
 
   const splitContent = contentHtml.split('</div>');
-  const titleResult = splitContent[0].split('<div>');
+  console.log('split',splitContent);
+  const titleResult = splitContent[0].split('<div');
+  let finalResult;
   if (titleResult[1]) {
-    title = titleResult[1];
+    finalResult = titleResult[1].split('>');
   } else {
-    title = titleResult[0];
+    finalResult = titleResult[0];
+  }
+  if (finalResult[1]) {
+    title = finalResult[1];
+  } else {
+    title = finalResult[0];
   }
 
   if (title && title !== '<br>') {

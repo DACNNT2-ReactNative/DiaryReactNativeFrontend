@@ -1,7 +1,6 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Dimensions, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Dialog, Divider, List, Portal } from 'react-native-paper';
+import { Dialog, Divider, List } from 'react-native-paper';
 import RenderHTML from 'react-native-render-html';
 import { SharedElement } from 'react-navigation-shared-element';
 
@@ -12,7 +11,6 @@ const DiaryOption = ({ route, navigation }) => {
   const { width } = useWindowDimensions();
   const [contentVisible, setContentVisible] = useState(true);
   const [actionVisible, setActionVisible] = useState(true);
-  console.log(diary);
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
     const tagsStyles = {
@@ -65,7 +63,11 @@ const DiaryOption = ({ route, navigation }) => {
             <List.Item
               title="Xóa"
               right={(props) => <List.Icon {...props} icon="delete" />}
-              onPress={() => console.log('press')}
+              onPress={() => {
+                setTimeout(() => {
+                  navigation.goBack();
+                }, 1000);
+              }}
             />
             <Divider />
           </View>
@@ -79,6 +81,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flex: 1,
+    backgroundColor: 'transparent',
   },
   dialog: {
     backgroundColor: 'transparent',

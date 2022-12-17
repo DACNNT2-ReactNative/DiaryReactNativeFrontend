@@ -1,10 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Paragraph } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import CreateDiaryDialog from '../components/dialogs/CreateDiaryDialog';
 import DiaryList from '../components/diary/DiaryList';
-
 
 const DiaryListScreen = ({ route, navigation }) => {
   const { topic } = route.params;
@@ -12,7 +11,7 @@ const DiaryListScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
   return (
-    <View style={styles.container}>      
+    <View style={styles.container}>
       <DiaryList topic={topic} navigation={navigation} />
       <CreateDiaryDialog topic={topic} navigation={navigation} />
     </View>

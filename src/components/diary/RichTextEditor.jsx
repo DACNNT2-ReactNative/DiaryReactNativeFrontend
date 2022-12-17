@@ -1,18 +1,15 @@
-import { Alert, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
-import { useRef, useState } from 'react';
-import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 import * as ImagePicker from 'expo-image-picker';
-import axiosConfig from '../../utils/axios';
-import { getFileInfo, isLessThanTheMB } from '../../utils/checkFileSize';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import { IconButton, Paragraph } from 'react-native-paper';
+import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
+import { useMutation } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { diarySelectors } from '../../redux/diary/selector';
 import { actions as diaryActions } from '../../redux/diary/slice';
-import { useEffect } from 'react';
-import { useMutation } from 'react-query';
-import { getTitleFromContent } from '../../utils/getTitleFromContent';
-import { IconButton, Paragraph } from 'react-native-paper';
-import Loading from '../Loading';
-import { getFullDateAndTime, getFullTime } from '../../utils/converDateTime';
+import axiosConfig from '../../utils/axios';
+import { getFileInfo, isLessThanTheMB } from '../../utils/checkFileSize';
+import { getFullDateAndTime } from '../../utils/converDateTime';
 
 const screen = Dimensions.get('screen');
 
@@ -22,6 +19,24 @@ const RichTextEditor = ({ diary, navigation }) => {
   const [textHtml, setTextHtml] = useState(diary.content);
   const [timeUpdated, setTimeUpdated] = useState(diary.updateAt);
   const editingDiary = useSelector(diarySelectors.getCurrentEditingDiary);
+
+  const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation(
+    (data) => {
+      return axiosConfig.post('Authenticate/upload-image', data);
+    },
+    {
+      onSuccess: (response) => {
+        richText.current.insertImage(response.data);
+      },
+      onError: (error) => {
+        if (error.title) {
+          Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
+        }
+      },
+    },
+  );
 
   const pickImage = async () => {
     const gallery = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,28 +54,30 @@ const RichTextEditor = ({ diary, navigation }) => {
 
     if (imageResult.cancelled) return;
 
-    if (imageResult.type !== 'image') return;
+    if (imageResult.type !== 'image') {
+      Alert.alert('', 'Hình ảnh không đúng định dạng.');
+      return;
+    }
 
     const fileInfo = await getFileInfo(imageResult.uri);
 
     if (!fileInfo?.size) {
-      Alert.alert('alert', "Can't select this file as the size is unknown.");
+      Alert.alert('', "Hình ảnh không hợp lệ.");
       return;
     }
 
     const isLessThan1MB = isLessThanTheMB(fileInfo.size, 1);
     if (!isLessThan1MB) {
-      Alert.alert('alert', 'Image size must be smaller than 1MB!');
+      Alert.alert('', 'Hình ảnh phải có dung lượng nhỏ hơn 1MB!');
       return;
     }
 
     const time = new Date().getTime();
     const data = {
-      ImageName: 'image' + time.toString() + '.png',
+      ImageName: 'image' + time.toString() + diary.diaryId + '.png',
       Base64String: imageResult?.base64,
     };
-    const response = await axiosConfig.post('Authenticate/upload-image', data);
-    richText.current.insertImage(response.data);
+    uploadImage(data);
   };
 
   const openCamera = async () => {
@@ -80,14 +97,14 @@ const RichTextEditor = ({ diary, navigation }) => {
     if (imageResult.cancelled) return;
 
     if (imageResult.type !== 'image') {
-      Alert.alert('', 'Hình ảnh không đúng định dạng');
+      Alert.alert('', 'Hình ảnh không đúng định dạng.');
       return;
     }
 
     const fileInfo = await getFileInfo(imageResult.uri);
 
     if (!fileInfo?.size) {
-      Alert.alert('', 'Hình ảnh không hợp lệ');
+      Alert.alert('', 'Hình ảnh không hợp lệ.');
       return;
     }
 
@@ -99,11 +116,10 @@ const RichTextEditor = ({ diary, navigation }) => {
 
     const time = new Date().getTime();
     const data = {
-      ImageName: 'test' + time.toString() + '.png',
+      ImageName: 'test' + time.toString() + diary.diaryId + '.png',
       Base64String: imageResult?.base64,
     };
-    const response = await axiosConfig.post('Authenticate/upload-image', data);
-    richText.current.insertImage(response.data);
+    uploadImage(data);
   };
 
   const { mutate: updateDiary, isLoading: isUpdating } = useMutation(
@@ -144,12 +160,9 @@ const RichTextEditor = ({ diary, navigation }) => {
   };
 
   useEffect(() => {
-    const title = getTitleFromContent(textHtml);
-    console.log('title', title);
     const updatedDiary = {
       diaryId: diary.diaryId,
       content: textHtml,
-      title: title,
     };
     const timer = setTimeout(() => {
       updateDiary(updatedDiary);
@@ -161,11 +174,9 @@ const RichTextEditor = ({ diary, navigation }) => {
   }, [textHtml]);
 
   const onSave = () => {
-    const title = getTitleFromContent(textHtml);
     const updatedDiary = {
       diaryId: diary.diaryId,
       content: textHtml,
-      title: title,
     };
     saveDiary(updatedDiary);
   };
@@ -183,14 +194,6 @@ const RichTextEditor = ({ diary, navigation }) => {
           initialContentHTML={diary.content ? diary.content : ''}
         />
       </ScrollView>
-      <IconButton
-        style={styles.saveButton}
-        icon="content-save-edit"
-        onPress={() => {
-          console.log('click');
-          onSave();
-        }}
-      />
       <Paragraph style={styles.lastSave}>
         Chỉnh sửa lần cuối vào {isUpdating ? '...' : getFullDateAndTime(timeUpdated)}
       </Paragraph>
@@ -199,17 +202,44 @@ const RichTextEditor = ({ diary, navigation }) => {
         selectedIconTint="#fe4141"
         iconTint="#e751d5"
         actions={[
-          actions.undo,
+          actions.alignLeft,
+          actions.alignCenter,
+          actions.alignRight,
+          actions.alignFull,
+          actions.fontSize,
+          actions.keyboard,
+        ]}
+        onPressAddImage={pickImage}
+        insertVideo={openCamera}
+        style={styles.richTextToolbarStyle}
+      />
+      <RichToolbar
+        editor={richText}
+        selectedIconTint="#fe4141"
+        iconTint="#e751d5"
+        actions={[
           actions.insertVideo,
           actions.insertImage,
           actions.setBold,
           actions.setItalic,
           actions.insertBulletsList,
           actions.setUnderline,
+          actions.setStrikethrough,
+          actions.undo,
           actions.redo,
-          actions.fontSize,
-          actions.keyboard,
+          actions.save,
         ]}
+        iconMap={{
+          [actions.save]: ({ tintColor }) => (
+            <IconButton
+              color={tintColor}
+              icon="content-save-edit"
+              onPress={() => {
+                onSave();
+              }}
+            />
+          ),
+        }}
         onPressAddImage={pickImage}
         insertVideo={openCamera}
         style={styles.richTextToolbarStyle}
@@ -230,7 +260,7 @@ const styles = StyleSheet.create({
   saveButton: {
     position: 'absolute',
     zIndex: 10,
-    top: 45,
+    top: 90,
     right: 5,
     width: 25,
     height: 25,

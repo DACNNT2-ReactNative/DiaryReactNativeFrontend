@@ -1,14 +1,15 @@
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { IconButton, List, Menu, Paragraph } from 'react-native-paper';
+import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Menu, Paragraph } from 'react-native-paper';
+import { SharedElement } from 'react-navigation-shared-element';
 import { useQuery } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
+import { authenticationSelectors } from '../../redux/authenticate/selector';
+import { topicSelectors } from '../../redux/topic/selector';
+import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
-import { authenticationSelectors } from '../../redux/authenticate/selector';
-import { actions as topicActions } from '../../redux/topic/slice';
-import { topicSelectors } from '../../redux/topic/selector';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, Dimensions, View } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 
 const screen = Dimensions.get('screen');
 
@@ -64,19 +65,32 @@ const TopicList = ({ navigation }) => {
     }
   }, [topicList]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      console.log('asdnasdkhsdkasdjasdjladjaif');
+      refetch();
+    }, 3000);
+  }, []);
+
+  if (!topics) {
+    console.log('topics loading');
+    return (
+      <View style={styles.loading}>
+        <Loading />
+      </View>
+    );
+  }
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.list}>
-        {isGettingTopics ? (
-          <Loading />
-        ) : (
-          [...topics].reverse().map((topic, index) => (
-            <View key={topic.topicId} style={styles.listItem}>
+        {[...topics].reverse().map((topic, index) => (
+          <SharedElement key={topic.topicId} id={topic.topicId}>
+            <View style={styles.listItem}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('DiaryList', { topic: topic })}
                 onLongPress={(event) => {
-                  onIconPress(event);
-                  setTopicSelected(topic);
+                  navigation.navigate('TopicOption', { topic: topic });
                 }}
               >
                 <View style={styles.topicNameBox}>
@@ -85,16 +99,18 @@ const TopicList = ({ navigation }) => {
                 <Image
                   style={styles.images}
                   source={{
-                    uri: `https://source.unsplash.com/random/200x200?${index}`,
+                    uri: topic.image
+                      ? topic.image
+                      : `https://source.unsplash.com/random/200x200?${index}`,
                   }}
                 />
               </TouchableOpacity>
             </View>
-          ))
-        )}
+          </SharedElement>
+        ))}
       </ScrollView>
 
-      <Menu visible={showMenu} onDismiss={closeMenu} anchor={menuAnchor}>
+      {/* <Menu visible={showMenu} onDismiss={closeMenu} anchor={menuAnchor}>
         <Menu.Item
           onPress={() => {
             dispatch(topicActions.setTopicOnDialog(topicSelected));
@@ -111,12 +127,17 @@ const TopicList = ({ navigation }) => {
           }}
           title="Xóa"
         />
-      </Menu>
+      </Menu> */}
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  loading: {
+    height: screen.height,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   listItem: {
     height: (screen.width - 40) / 2,
     width: (screen.width - 40) / 2,

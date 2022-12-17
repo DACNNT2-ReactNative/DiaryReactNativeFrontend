@@ -37,13 +37,7 @@ const UpdateTopicDialog = () => {
     {
       onSuccess: (response) => {
         console.log(response.data);
-        const { topicId, name, userId } = response.data;
-        const topicUpdate = {
-          topicId,
-          name,
-          userId,
-        };
-        dispatch(topicActions.updateTopicInTopics(topicUpdate));
+        dispatch(topicActions.updateTopicInTopics(response.data));
         hideDialogUpdateTopic();
       },
       onError: (error) => {

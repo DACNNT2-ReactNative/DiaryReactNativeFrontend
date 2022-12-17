@@ -10,6 +10,7 @@ import DiaryList from '../screen/DiaryListScreen';
 import DiaryOption from '../screen/DiaryOption';
 import Home from '../screen/Home';
 import Setting from '../screen/Setting';
+import TopicOption from '../screen/TopicOption';
 
 const Stack = createSharedElementStackNavigator();
 
@@ -67,6 +68,21 @@ const MainStackNavigator = () => {
         component={Home}
       />
       <Stack.Screen
+        name="TopicOption"
+        options={{
+          headerShown: false,
+          title: '',
+          headerLeft: () => {
+            return null;
+          },
+          cardStyleInterpolator: forFade,
+        }}
+        component={TopicOption}
+        sharedElements={(route) => {
+          return [route.params.topic.topicId];
+        }}
+      />
+      <Stack.Screen
         name="Setting"
         options={{ title: 'Thông tin cá nhân', unmountOnBlur: true }}
         component={Setting}
@@ -74,7 +90,7 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="DiaryList"
         options={{
-          title: '',
+          title: 'Nhật ký',
           unmountOnBlur: true,
           headerRight: () => (
             <IconButton

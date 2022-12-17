@@ -71,7 +71,7 @@ const AddTopicDialog = () => {
       >
         <Dialog.Content>
           <View style={styles.content}>
-            <Paragraph>Thêm chủ để</Paragraph>
+            <Paragraph>Thêm chủ đề</Paragraph>
             {isLoading ? (
               <View style={styles.loading}>
                 <Loading />
