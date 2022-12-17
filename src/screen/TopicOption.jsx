@@ -76,7 +76,10 @@ const TopicOption = ({ route, navigation }) => {
       quality: 1,
     });
 
-    const data = await getImageData(imageResult, topic.topicId)
+    const data = await getImageData(imageResult, topic.topicId);
+    if (!data) {
+      return;
+    }
     uploadImage(data);
   };
 
@@ -86,9 +89,9 @@ const TopicOption = ({ route, navigation }) => {
         style={styles.dialog}
         visible={true}
         onDismiss={() => {
-          if(isUploadingImage || isUpdatingTopic){
+          if (isUploadingImage || isUpdatingTopic) {
             return;
-          }          
+          }
           setActionVisible(false);
           navigation.goBack();
         }}

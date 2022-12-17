@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { diarySelectors } from '../../redux/diary/selector';
 import { actions as diaryActions } from '../../redux/diary/slice';
 import axiosConfig from '../../utils/axios';
-import { getFileInfo, isLessThanTheMB } from '../../utils/checkFileSize';
+import { getFileInfo, getImageData, isLessThanTheMB } from '../../utils/checkFileSize';
 import { getFullDateAndTime } from '../../utils/converDateTime';
 
 const screen = Dimensions.get('screen');
@@ -52,31 +52,10 @@ const RichTextEditor = ({ diary, navigation }) => {
       quality: 1,
     });
 
-    if (imageResult.cancelled) return;
-
-    if (imageResult.type !== 'image') {
-      Alert.alert('', 'Hình ảnh không đúng định dạng.');
+    const data = await getImageData(imageResult, diary.diaryId);
+    if (!data) {
       return;
     }
-
-    const fileInfo = await getFileInfo(imageResult.uri);
-
-    if (!fileInfo?.size) {
-      Alert.alert('', "Hình ảnh không hợp lệ.");
-      return;
-    }
-
-    const isLessThan1MB = isLessThanTheMB(fileInfo.size, 1);
-    if (!isLessThan1MB) {
-      Alert.alert('', 'Hình ảnh phải có dung lượng nhỏ hơn 1MB!');
-      return;
-    }
-
-    const time = new Date().getTime();
-    const data = {
-      ImageName: 'image' + time.toString() + diary.diaryId + '.png',
-      Base64String: imageResult?.base64,
-    };
     uploadImage(data);
   };
 
@@ -94,31 +73,10 @@ const RichTextEditor = ({ diary, navigation }) => {
       quality: 1,
     });
 
-    if (imageResult.cancelled) return;
-
-    if (imageResult.type !== 'image') {
-      Alert.alert('', 'Hình ảnh không đúng định dạng.');
+    const data = await getImageData(imageResult, diary.diaryId);
+    if (!data) {
       return;
     }
-
-    const fileInfo = await getFileInfo(imageResult.uri);
-
-    if (!fileInfo?.size) {
-      Alert.alert('', 'Hình ảnh không hợp lệ.');
-      return;
-    }
-
-    const isLessThan1MB = isLessThanTheMB(fileInfo.size, 1);
-    if (!isLessThan1MB) {
-      Alert.alert('', 'Hình ảnh phải có dung lượng nhỏ hơn 1MB!');
-      return;
-    }
-
-    const time = new Date().getTime();
-    const data = {
-      ImageName: 'test' + time.toString() + diary.diaryId + '.png',
-      Base64String: imageResult?.base64,
-    };
     uploadImage(data);
   };
 

@@ -13,6 +13,7 @@ const DiaryOption = ({ route, navigation }) => {
   const [actionVisible, setActionVisible] = useState(true);
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
+    const imgWidth = screen.width - 50;
     const tagsStyles = {
       body: {
         whiteSpace: 'normal',
@@ -20,6 +21,13 @@ const DiaryOption = ({ route, navigation }) => {
       },
       div: {
         fontSize: '12px',
+      },
+      img: {
+        height: 'auto',
+        width: 'auto',
+        maxWidth: `${imgWidth}px`,
+        maxHeight: `${imgWidth}px`,
+        transform: [{ scale: 0.7 }],
       },
     };
     return (
@@ -97,6 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbead1',
     borderRadius: 12,
     padding: 20,
+    overflow: 'hidden',
   },
   actions: {
     width: screen.width / 2,

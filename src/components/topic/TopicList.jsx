@@ -67,7 +67,6 @@ const TopicList = ({ navigation }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      console.log('asdnasdkhsdkasdjasdjladjaif');
       refetch();
     }, 3000);
   }, []);

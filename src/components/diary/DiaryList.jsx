@@ -81,6 +81,7 @@ const DiaryList = ({ topic, navigation }) => {
   };
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
+    const imgWidth = (screen.width - 80) / 3;
     const tagsStyles = {
       body: {
         whiteSpace: 'normal',
@@ -92,6 +93,13 @@ const DiaryList = ({ topic, navigation }) => {
       p: {
         fontSize: '3px',
       },
+      img: {
+        height: 'auto',
+        width: 'auto',
+        maxWidth: `${imgWidth}px`,
+        maxHeight: `${imgWidth}px`,
+        transform: [{ scale: 0.5 }],
+      }
     };
     return (
       <RenderHTML
