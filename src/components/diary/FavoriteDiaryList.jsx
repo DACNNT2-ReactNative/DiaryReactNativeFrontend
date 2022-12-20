@@ -10,6 +10,7 @@ import { useMutation, useQuery } from 'react-query';
 import { useEffect } from 'react';
 import { actions as diaryActions } from '../../redux/diary/slice';
 import { diarySelectors } from '../../redux/diary/selector';
+import { authenticationSelectors } from '../../redux/authenticate/selector';
 import Loading from '../Loading';
 import axiosConfig from '../../utils/axios';
 import { TouchableOpacity } from 'react-native';
@@ -20,11 +21,12 @@ import { SharedElement } from 'react-navigation-shared-element';
 
 const screen = Dimensions.get('screen');
 
-const DiaryList = ({ topic, navigation }) => {
+const FavoriteDiaryList = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const diaries = useSelector(diarySelectors.getDiaries);
+  const currentUser = useSelector(authenticationSelectors.getCurrentUser);
 
   const {
     data: diaryList,
@@ -33,15 +35,15 @@ const DiaryList = ({ topic, navigation }) => {
   } = useQuery(
     ['diaries'],
     async () => {
-      const response = await axiosConfig.get('Diary/get-diaries-by-topic-id', {
-        params: { topicId: topic.topicId },
+      const response = await axiosConfig.get('Diary/get-favorite-diaries-by-user-id', {
+        params: { userId: currentUser.userId },
       });
       //console.log('get diaries res', response.data);
       return response.data;
     },
     {
       onError: () => {
-        console.log('error get topics');
+        console.log('error get favorite topics');
       },
     },
   );
@@ -51,13 +53,6 @@ const DiaryList = ({ topic, navigation }) => {
   useEffect(() => {
     if (isFocused) {
       refetch();
-      diaries.map((diary) => {
-        setTimeout(() => {
-          if (!diary.content || diary.content === '') {
-            dispatch(diaryActions.removeDiaryFromList(diary));
-          }
-        }, 800);
-      });
     }
   }, [isFocused]);
 
@@ -148,7 +143,7 @@ const DiaryList = ({ topic, navigation }) => {
               style={styles.listItem}
             >
               <WebDisplay content={diary.content ? diary.content : source.html} />
-              {diary.isLiked && <List.Icon color='#ff5353' style={styles.heart} icon="heart" />}
+              {diary.isLiked && <List.Icon color="#ff5353" style={styles.heart} icon="heart" />}
             </TouchableOpacity>
           </SharedElement>
           <View style={styles.title}>
@@ -205,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DiaryList;
+export default FavoriteDiaryList;

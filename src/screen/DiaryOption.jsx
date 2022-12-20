@@ -3,14 +3,35 @@ import { Dimensions, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { Dialog, Divider, List } from 'react-native-paper';
 import RenderHTML from 'react-native-render-html';
 import { SharedElement } from 'react-navigation-shared-element';
+import { useMutation } from 'react-query';
+import axiosConfig from '../utils/axios';
+import { actions as diaryActions } from '../redux/diary/slice';
+import { useDispatch } from 'react-redux';
 
 const screen = Dimensions.get('screen');
 
 const DiaryOption = ({ route, navigation }) => {
   const { diary } = route.params;
   const { width } = useWindowDimensions();
+  const dispatch = useDispatch();
   const [contentVisible, setContentVisible] = useState(true);
   const [actionVisible, setActionVisible] = useState(true);
+
+  const { mutate: updateDiary, isLoading: isUpdating } = useMutation(
+    (diary) => {
+      return axiosConfig.put('Diary/update-diary', diary);
+    },
+    {
+      onSuccess: (response) => {
+        console.log('updated', response.data);
+        dispatch(diaryActions.updateDiaryInDiaries(response.data));        
+        navigation.goBack();
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    },
+  );
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
     const imgWidth = screen.width - 50;
@@ -46,6 +67,9 @@ const DiaryOption = ({ route, navigation }) => {
         style={styles.dialog}
         visible={contentVisible}
         onDismiss={() => {
+          if (isUpdating) {
+            return;
+          }
           setActionVisible(false);
           navigation.goBack();
         }}
@@ -65,6 +89,20 @@ const DiaryOption = ({ route, navigation }) => {
               onPress={() => {
                 setContentVisible(false);
                 navigation.replace('DiaryEdit', { diary: diary });
+              }}
+            />
+            <Divider />
+            <Divider />
+            <List.Item
+              title="Yêu thích"
+              right={(props) => diary.isLiked ? <List.Icon {...props} icon="heart" /> : <List.Icon {...props} icon="heart-outline" />}
+              onPress={() => {
+                const updatedDiary = {
+                  diaryId: diary.diaryId,
+                  isLiked: !diary.isLiked
+                };
+                updateDiary(updatedDiary);
+                setActionVisible(false);
               }}
             />
             <Divider />

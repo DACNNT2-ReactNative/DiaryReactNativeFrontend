@@ -5,7 +5,7 @@ import { removeAccessToken } from '../utils/token-config';
 import { actions as authActions } from '../redux/authenticate/slice';
 import { useDispatch } from 'react-redux';
 
-function Setting() {
+function Setting({ route, navigation }) {
   const dispatch = useDispatch();
   const onLogoutPressed = async () => {
     await removeAccessToken();
@@ -18,10 +18,19 @@ function Setting() {
       <Button
         mode="contained"
         onPress={() => {
-          removeAccessToken();
-          dispatch(authActions.setAuthenticated(false))
+          navigation.navigate('DiaryList', { topic: null });
         }}
-      >Logout</Button>            
+      >
+        Nhật ký yêu thích
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => {
+          onLogoutPressed();
+        }}
+      >
+        Logout
+      </Button>
     </View>
   );
 }
