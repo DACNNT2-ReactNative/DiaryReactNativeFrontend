@@ -9,6 +9,7 @@ import DiaryEdit from '../screen/DiaryEdit';
 import DiaryList from '../screen/DiaryListScreen';
 import DiaryOption from '../screen/DiaryOption';
 import Home from '../screen/Home';
+import PassCode from '../screen/PassCode';
 import Setting from '../screen/Setting';
 import TopicOption from '../screen/TopicOption';
 
@@ -103,6 +104,11 @@ const MainStackNavigator = () => {
           ),
         }}
         component={DiaryList}
+      />
+      <Stack.Screen
+        name="PassCode"
+        options={{ title: 'Mã bảo mật', unmountOnBlur: true }}
+        component={PassCode}
       />
       <Stack.Screen
         name="DiaryOption"

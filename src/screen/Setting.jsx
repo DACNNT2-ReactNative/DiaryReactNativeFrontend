@@ -26,6 +26,14 @@ function Setting({ route, navigation }) {
       <Button
         mode="contained"
         onPress={() => {
+          navigation.navigate('PassCode');
+        }}
+      >
+        Mã bảo mật
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => {
           onLogoutPressed();
         }}
       >

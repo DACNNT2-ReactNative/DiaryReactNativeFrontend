@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Alert } from 'react-native';
-import { Text, HelperText, IconButton } from 'react-native-paper';
+import { Text, HelperText, IconButton, Portal, Dialog, Paragraph } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
 import Header from '../components/Header';
@@ -16,11 +16,14 @@ import { useMutation } from 'react-query';
 import { setAccessToken } from '../utils/token-config';
 import Loading from '../components/Loading';
 import * as Google from 'expo-auth-session/providers/google';
+import { passCodeValidator } from '../helpers/passCodeValidator';
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
   const [username, setUsername] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
+  const [passCode, setPassCode] = useState({ value: '', error: '' });
+  const [isSecure, setIsSecure] = useState(false);
   const [error, setError] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -45,7 +48,9 @@ export default function Login({ navigation }) {
       },
       onError: (error) => {
         console.log('error login', error);
-        if (error.title) {
+        if (error.status === 400) {
+          setIsSecure(true);
+        } else if (error.title) {
           Alert.alert('', error.title);
         } else {
           Alert.alert('', error);
@@ -65,6 +70,24 @@ export default function Login({ navigation }) {
     const data = {
       username: username.value,
       password: password.value,
+    };
+    loginUser(data);
+  };
+
+  const onLoginWithPassCodePress = () => {
+    const userNameError = usernameValidator(username.value);
+    const passwordError = passwordValidator(password.value);
+    const passCodeError = passCodeValidator(passCode.value);
+    if (userNameError || passwordError || passCodeError) {
+      setUsername({ ...username, error: userNameError });
+      setPassword({ ...password, error: passwordError });
+      setPassCode({ ...passCode, error: passCodeError });
+      return;
+    }
+    const data = {
+      username: username.value,
+      password: password.value,
+      passCode: passCode.value,
     };
     loginUser(data);
   };
@@ -90,6 +113,51 @@ export default function Login({ navigation }) {
     <Background
       children={
         <>
+          {isSecure ? (
+            <Portal>
+              <Dialog
+                style={styles.dialog}
+                visible={true}
+                onDismiss={() => {
+                  setIsSecure(false);
+                }}
+              >
+                <Dialog.Content>
+                  <View style={styles.content}>
+                    <Paragraph>Nhập mã bảo mật</Paragraph>
+                    <TextInput
+                      secureTextEntry
+                      label="Mã bảo mật"
+                      returnKeyType="next"
+                      value={passCode.value}
+                      onChangeText={(text) => setPassCode({ value: text, error: '' })}
+                      autoCapitalize="none"
+                      error={!!passCode.error}
+                      errorText={passCode.error}
+                      autoCompleteType="passCode"
+                      textContentType="passCode"
+                      keyboardType="passCode"
+                    />
+                  </View>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <View style={styles.actions}>
+                    <View style={styles.button}>
+                      <Button
+                        mode="contained"
+                        loading={isLoading}
+                        onPress={onLoginWithPassCodePress}
+                      >
+                        Xác nhận
+                      </Button>
+                    </View>
+                  </View>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+          ) : (
+            ''
+          )}
           <View style={styles.headers}>
             <Text style={styles.texHeader}>Chào mừng trở lại</Text>
             <Text style={styles.title}>
@@ -212,5 +280,27 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
     color: theme.colors.primary,
+  },
+  loading: {
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dialog: {
+    borderRadius: 25,
+  },
+  content: {
+    marginBottom: -20,
+  },
+  actions: {
+    width: '100%',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  button: {
+    width: '50%',
+    paddingBottom: 5,
   },
 });
