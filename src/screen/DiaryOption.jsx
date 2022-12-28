@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dimensions, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Alert, Dimensions, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Dialog, Divider, List } from 'react-native-paper';
 import RenderHTML from 'react-native-render-html';
 import { SharedElement } from 'react-navigation-shared-element';
@@ -24,7 +24,7 @@ const DiaryOption = ({ route, navigation }) => {
     {
       onSuccess: (response) => {
         console.log('updated', response.data);
-        dispatch(diaryActions.updateDiaryInDiaries(response.data));        
+        dispatch(diaryActions.updateDiaryInDiaries(response.data));
         navigation.goBack();
       },
       onError: (error) => {
@@ -32,6 +32,52 @@ const DiaryOption = ({ route, navigation }) => {
       },
     },
   );
+
+  const { mutate: deleteDiary, isLoading: isDeleting } = useMutation(
+    (diaryId) => {
+      return axiosConfig.delete('Diary/delete-diary-by-id', { params: { diaryId: diaryId } });
+    },
+    {
+      onSuccess: (response) => {
+        console.log(response.data);
+        const diaryDelete = {
+          diaryId: response.data,
+        };
+        dispatch(diaryActions.removeDiaryFromList(diaryDelete));
+        navigation.goBack();
+        Alert.alert('', 'Xóa nhật ký thành công');
+      },
+      onError: (error) => {
+        if (error.title) {
+          Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
+        }
+      },
+    },
+  );
+
+  const deleteAlert = () =>
+    Alert.alert(
+      '',
+      'Bạn có muốn xóa nhật ký này?',
+      [        
+        {
+          text: 'Hủy bỏ',
+          onPress: () => {console.log('cancle')},
+        },
+        {
+          text: 'Xác nhận',
+          onPress: () => {
+            deleteDiary(diary.diaryId);
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {console.log('dismiss')},
+      },
+    );
 
   const WebDisplay = React.memo(function WebDisplay({ content }) {
     const imgWidth = screen.width - 50;
@@ -95,11 +141,17 @@ const DiaryOption = ({ route, navigation }) => {
             <Divider />
             <List.Item
               title="Yêu thích"
-              right={(props) => diary.isLiked ? <List.Icon {...props} icon="heart" /> : <List.Icon {...props} icon="heart-outline" />}
+              right={(props) =>
+                diary.isLiked ? (
+                  <List.Icon {...props} icon="heart" />
+                ) : (
+                  <List.Icon {...props} icon="heart-outline" />
+                )
+              }
               onPress={() => {
                 const updatedDiary = {
                   diaryId: diary.diaryId,
-                  isLiked: !diary.isLiked
+                  isLiked: !diary.isLiked,
                 };
                 updateDiary(updatedDiary);
                 setActionVisible(false);
@@ -110,9 +162,7 @@ const DiaryOption = ({ route, navigation }) => {
               title="Xóa"
               right={(props) => <List.Icon {...props} icon="delete" />}
               onPress={() => {
-                setTimeout(() => {
-                  navigation.goBack();
-                }, 1000);
+                deleteAlert();
               }}
             />
             <Divider />
