@@ -59,6 +59,32 @@ export default function Login({ navigation }) {
     },
   );
 
+  const { mutate: loginGoogle, isLoadingGoogle } = useMutation(
+    (loginData) => {
+      return axiosConfig.post('Authenticate/login-google', loginData);
+    },
+    {
+      onSuccess: async (response) => {
+        await setAccessToken(response.data.token);
+        const responseUser = await axiosConfig.get('Authenticate/decode-token', {
+          headers: { jwttoken: response.data.token },
+        });
+        dispatch(authActions.setUser(responseUser.data));
+        dispatch(authActions.setAuthenticated(true));
+      },
+      onError: (error) => {
+        console.log('error login', error);
+        if (error.status === 400) {
+          setIsSecure(true);
+        } else if (error.title) {
+          Alert.alert('', error.title);
+        } else {
+          Alert.alert('', error);
+        }
+      },
+    },
+  );
+
   const onLoginPressed = () => {
     const userNameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
@@ -102,6 +128,12 @@ export default function Login({ navigation }) {
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
+          loginGoogle({
+            username: data.email,
+            email: data.email,
+            fullName: data?.name || data?.email,
+          });
+          console.log(isLoadingGoogle);
         })
         .catch((error) => {
           console.error(error);
@@ -196,7 +228,6 @@ export default function Login({ navigation }) {
           <Button mode="contained" onPress={onLoginPressed} loading={isLoading}>
             Đăng nhập
           </Button>
-
           <Text
             style={{
               marginTop: 20,
@@ -211,7 +242,6 @@ export default function Login({ navigation }) {
           >
             - Đăng nhập bằng Google -
           </Text>
-
           <Button
             mode="contained"
             disabled={!request}
@@ -234,7 +264,6 @@ export default function Login({ navigation }) {
           >
             Google
           </Button>
-
           <View style={styles.row}>
             <Text>Bạn chưa có tài khoản? </Text>
             <TouchableOpacity onPress={() => navigation.replace('Register')}>
