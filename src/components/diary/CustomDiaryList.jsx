@@ -18,10 +18,11 @@ import { List, Paragraph } from 'react-native-paper';
 import { getFullDate } from '../../utils/converDateTime';
 import { shortenTitle } from '../../utils/checkTitle';
 import { SharedElement } from 'react-navigation-shared-element';
+import { diaryListType, diaryStatus } from '../../constants/diaryStatus';
 
 const screen = Dimensions.get('screen');
 
-const FavoriteDiaryList = ({ navigation }) => {
+const CustomDiaryList = ({ topic, navigation }) => {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
@@ -35,7 +36,13 @@ const FavoriteDiaryList = ({ navigation }) => {
   } = useQuery(
     ['diaries'],
     async () => {
-      const response = await axiosConfig.get('Diary/get-favorite-diaries-by-user-id', {
+      let url = '';
+      if (topic === diaryListType.favorite) {
+        url = 'Diary/get-favorite-diaries-by-user-id';
+      } else if (topic === diaryListType.shared) {
+        url = 'Diary/get-shared-diaries-by-user-id';
+      }
+      const response = await axiosConfig.get(url, {
         params: { userId: currentUser.userId },
       });
       //console.log('get diaries res', response.data);
@@ -43,12 +50,12 @@ const FavoriteDiaryList = ({ navigation }) => {
     },
     {
       onError: () => {
-        console.log('error get favorite topics');
+        console.log('error get custom topics');
       },
     },
   );
 
-  //console.log('get diaries', diaryList);
+  console.log('get diaries', diaryList);
 
   useEffect(() => {
     if (isFocused) {
@@ -144,6 +151,9 @@ const FavoriteDiaryList = ({ navigation }) => {
             >
               <WebDisplay content={diary.content ? diary.content : source.html} />
               {diary.isLiked && <List.Icon color="#ff5353" style={styles.heart} icon="heart" />}
+              {diary.status === diaryStatus.public && (
+                <List.Icon style={styles.public} icon="share" />
+              )}
             </TouchableOpacity>
           </SharedElement>
           <View style={styles.title}>
@@ -198,6 +208,13 @@ const styles = StyleSheet.create({
     bottom: -15,
     right: -15,
   },
+  public: {
+    position: 'absolute',
+    transform: [{ scale: 0.5 }],
+    zIndex: 3,
+    top: -15,
+    right: -15,
+  },
 });
 
-export default FavoriteDiaryList;
+export default CustomDiaryList;

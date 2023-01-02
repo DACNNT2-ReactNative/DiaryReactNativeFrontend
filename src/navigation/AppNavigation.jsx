@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../contexts/AuthContext';
-
+import { createNavigationContainerRef } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import Loading from '../components/Loading';
@@ -16,13 +16,16 @@ import Register from '../screen/Register';
 import Setting from '../screen/Setting';
 import MainStackNavigator from './MainStack';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createSharedElementStackNavigator();
 
-function AppNavigation() {
-  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
+export const navigationRef = createNavigationContainerRef();
 
+function AppNavigation() {
+  const [route, setRoute] = useState();
+  const isAuthenticated = useSelector(authenticationSelectors.isUserAuthenticated);
   const isDecodingToken = useDecodeToken();
 
   if (isDecodingToken) {
@@ -33,9 +36,18 @@ function AppNavigation() {
     );
   }
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      onReady={() => {
+        setRoute(navigationRef.getCurrentRoute());
+      }}
+      onStateChange={async () => {
+        const currentRoute = navigationRef.getCurrentRoute();
+        setRoute(currentRoute);
+      }}
+      ref={navigationRef}
+    >
       {isAuthenticated && !isDecodingToken ? (
-        <MainStackNavigator />
+        <MainStackNavigator route={route} />
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />

@@ -17,8 +17,8 @@ const RichTextEditor = ({ diary, navigation }) => {
   const richText = useRef();
   const dispatch = useDispatch();
   const [textHtml, setTextHtml] = useState(diary.content);
+  const [fontSize, setFontSize] = useState(16);
   const [timeUpdated, setTimeUpdated] = useState(diary.updateAt);
-  const editingDiary = useSelector(diarySelectors.getCurrentEditingDiary);
 
   const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation(
     (data) => {
@@ -26,7 +26,7 @@ const RichTextEditor = ({ diary, navigation }) => {
     },
     {
       onSuccess: (response) => {
-        richText.current.insertImage(response.data);
+        richText.current.insertImage(response.data, 'width: 100px, height: 100px');
       },
       onError: (error) => {
         if (error.title) {
@@ -38,6 +38,7 @@ const RichTextEditor = ({ diary, navigation }) => {
     },
   );
 
+  console.log(fontSize);
   const pickImage = async () => {
     const gallery = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (gallery.granted === false) {
@@ -50,6 +51,8 @@ const RichTextEditor = ({ diary, navigation }) => {
       allowsEditing: true,
       base64: true,
       quality: 1,
+      height: 10,
+      width: 10,
     });
 
     const data = await getImageData(imageResult, diary.diaryId);
@@ -71,6 +74,8 @@ const RichTextEditor = ({ diary, navigation }) => {
       allowsEditing: true,
       base64: true,
       quality: 1,
+      height: 10,
+      width: 10,
     });
 
     const data = await getImageData(imageResult, diary.diaryId);
@@ -147,7 +152,9 @@ const RichTextEditor = ({ diary, navigation }) => {
           onChange={richTextHandle}
           placeholder="Tiêu đề"
           androidHardwareAccelerationDisabled={true}
-          style={styles.richTextEditorStyle}
+          editorStyle={{
+            contentCSSText: `font-size: ${fontSize}px;`,
+          }}
           initialHeight={screen.height - 70}
           initialContentHTML={diary.content ? diary.content : ''}
         />
@@ -160,15 +167,34 @@ const RichTextEditor = ({ diary, navigation }) => {
         selectedIconTint="#fe4141"
         iconTint="#e751d5"
         actions={[
+          actions.fontSize,
+          actions.fontSizeDown,
           actions.alignLeft,
           actions.alignCenter,
           actions.alignRight,
           actions.alignFull,
-          actions.fontSize,
           actions.keyboard,
         ]}
-        onPressAddImage={pickImage}
-        insertVideo={openCamera}
+        iconMap={{
+          [actions.fontSize]: ({ tintColor }) => (
+            <IconButton
+              color={tintColor}
+              icon="format-font-size-increase"
+              onPress={() => {
+                setFontSize((prev) => prev + 2);
+              }}
+            />
+          ),
+          [actions.fontSizeDown]: ({ tintColor }) => (
+            <IconButton
+              color={tintColor}
+              icon="format-font-size-decrease"
+              onPress={() => {
+                setFontSize((prev) => prev - 2);
+              }}
+            />
+          ),
+        }}
         style={styles.richTextToolbarStyle}
       />
       <RichToolbar
@@ -214,14 +240,6 @@ const styles = StyleSheet.create({
   },
   richTextEditorStyle: {
     fontSize: 20,
-  },
-  saveButton: {
-    position: 'absolute',
-    zIndex: 10,
-    top: 90,
-    right: 5,
-    width: 25,
-    height: 25,
   },
   richTextToolbarStyle: {
     backgroundColor: '#c6c3b3',

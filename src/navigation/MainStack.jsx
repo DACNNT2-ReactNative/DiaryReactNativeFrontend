@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { useDispatch } from 'react-redux';
+import { diaryListType } from '../constants/diaryStatus';
 import { actions as diaryActions } from '../redux/diary/slice';
 import { actions as topicActions } from '../redux/topic/slice';
 import DiaryEdit from '../screen/DiaryEdit';
@@ -23,14 +24,36 @@ const screenOptionStyle = {
   headerBackTitle: 'Back',
 };
 
-const MainStackNavigator = () => {
+const MainStackNavigator = ({ route }) => {
   const dispatch = useDispatch();
+  const routeMain = route;
 
   const forFade = ({ current }) => ({
     cardStyle: {
       opacity: current.progress,
     },
   });
+
+  let headerRightDiaryList = '';
+  let diaryListTitle = 'Nhật ký';
+
+  if (routeMain?.params?.topic === diaryListType.favorite) {
+    diaryListTitle = 'Nhật ký yêu thích';
+  } else if (routeMain?.params?.topic === diaryListType.shared) {
+    diaryListTitle = 'Nhật ký chia sẻ';
+  } else if (routeMain?.params?.topic === diaryListType.public) {
+    diaryListTitle = 'Cộng đồng';
+  } else {
+    headerRightDiaryList = (
+      <IconButton
+        style={styles.addButton}
+        icon="file-document-edit-outline"
+        onPress={() => {
+          dispatch(diaryActions.setCreateDiaryDialogVisible(true));
+        }}
+      />
+    );
+  }
 
   return (
     <Stack.Navigator
@@ -91,17 +114,9 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="DiaryList"
         options={{
-          title: 'Nhật ký',
+          title: diaryListTitle,
           unmountOnBlur: true,
-          headerRight: () => (
-            <IconButton
-              style={styles.addButton}
-              icon="file-document-edit-outline"
-              onPress={() => {
-                dispatch(diaryActions.setCreateDiaryDialogVisible(true));
-              }}
-            />
-          ),
+          headerRight: () => headerRightDiaryList,
         }}
         component={DiaryList}
       />

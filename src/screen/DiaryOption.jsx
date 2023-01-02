@@ -7,6 +7,7 @@ import { useMutation } from 'react-query';
 import axiosConfig from '../utils/axios';
 import { actions as diaryActions } from '../redux/diary/slice';
 import { useDispatch } from 'react-redux';
+import { diaryStatus } from '../constants/diaryStatus';
 
 const screen = Dimensions.get('screen');
 
@@ -61,10 +62,12 @@ const DiaryOption = ({ route, navigation }) => {
     Alert.alert(
       '',
       'Bạn có muốn xóa nhật ký này?',
-      [        
+      [
         {
           text: 'Hủy bỏ',
-          onPress: () => {console.log('cancle')},
+          onPress: () => {
+            console.log('cancle');
+          },
         },
         {
           text: 'Xác nhận',
@@ -75,7 +78,9 @@ const DiaryOption = ({ route, navigation }) => {
       ],
       {
         cancelable: true,
-        onDismiss: () => {console.log('dismiss')},
+        onDismiss: () => {
+          console.log('dismiss');
+        },
       },
     );
 
@@ -158,6 +163,35 @@ const DiaryOption = ({ route, navigation }) => {
               }}
             />
             <Divider />
+            {diary.status === diaryStatus.private && (
+              <List.Item
+                title="Chia sẻ"
+                right={(props) => <List.Icon {...props} icon="share" />}
+                onPress={() => {
+                  const updatedDiary = {
+                    diaryId: diary.diaryId,
+                    status: diaryStatus.public,
+                  };
+                  updateDiary(updatedDiary);
+                  setActionVisible(false);
+                }}
+              />
+            )}
+            {diary.status === diaryStatus.public && (
+              <List.Item
+                title="Gỡ chia sẻ"
+                right={(props) => <List.Icon {...props} icon="share-off" />}
+                onPress={() => {
+                  const updatedDiary = {
+                    diaryId: diary.diaryId,
+                    status: diaryStatus.private,
+                  };
+                  updateDiary(updatedDiary);
+                  setActionVisible(false);
+                }}
+              />
+            )}
+            <Divider />
             <List.Item
               title="Xóa"
               right={(props) => <List.Icon {...props} icon="delete" />}
@@ -186,6 +220,7 @@ const styles = StyleSheet.create({
     marginTop: -150,
     marginLeft: 0,
     alignItems: 'center',
+    elevation: 0,
   },
   diary: {
     height: screen.width - 50,

@@ -7,6 +7,7 @@ import { actions as diaryActions } from '../../redux/diary/slice';
 import { useMutation } from 'react-query';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
+import { iconDiaryList } from '../../constants/iconDiaryList';
 
 const screen = Dimensions.get('screen');
 
@@ -68,16 +69,16 @@ const CreateDiaryDialog = (props) => {
               </View>
             ) : (
               <View style={styles.listIcon}>
-                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary('happy')}>
+                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary(iconDiaryList.happy)}>
                   <Image source={require('../../assets/happy.png')} style={styles.iconImages} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary('sad')}>
+                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary(iconDiaryList.sad)}>
                   <Image source={require('../../assets/sad.png')} style={styles.iconImages} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary('surprise')}>
+                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary(iconDiaryList.surprise)}>
                   <Image source={require('../../assets/surprise.png')} style={styles.iconImages} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary('fear')}>
+                <TouchableOpacity style={styles.iconItem} onPress={() => onCreateDiary(iconDiaryList.fear)}>
                   <Image source={require('../../assets/fear.png')} style={styles.iconImages} />
                 </TouchableOpacity>
               </View>

@@ -1,22 +1,18 @@
-import React from 'react';
-import { useWindowDimensions } from 'react-native';
-import { Dimensions } from 'react-native';
-import { View } from 'react-native';
-import { StyleSheet, ScrollView } from 'react-native';
-import RenderHTML from 'react-native-render-html';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
-import { useMutation, useQuery } from 'react-query';
-import { useEffect } from 'react';
-import { actions as diaryActions } from '../../redux/diary/slice';
-import { diarySelectors } from '../../redux/diary/selector';
-import Loading from '../Loading';
-import axiosConfig from '../../utils/axios';
-import { TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { List, Paragraph } from 'react-native-paper';
-import { getFullDate } from '../../utils/converDateTime';
-import { shortenTitle } from '../../utils/checkTitle';
+import RenderHTML from 'react-native-render-html';
 import { SharedElement } from 'react-navigation-shared-element';
+import { useQuery } from 'react-query';
+import { useDispatch, useSelector } from 'react-redux';
+import { diaryStatus } from '../../constants/diaryStatus';
+import { diarySelectors } from '../../redux/diary/selector';
+import { actions as diaryActions } from '../../redux/diary/slice';
+import axiosConfig from '../../utils/axios';
+import { shortenTitle } from '../../utils/checkTitle';
+import { getFullDate } from '../../utils/converDateTime';
+import Loading from '../Loading';
 
 const screen = Dimensions.get('screen');
 
@@ -46,7 +42,7 @@ const DiaryList = ({ topic, navigation }) => {
     },
   );
 
-  //console.log('get diaries', diaryList);
+  console.log('get diaries', diaryList);
 
   useEffect(() => {
     if (isFocused) {
@@ -149,6 +145,7 @@ const DiaryList = ({ topic, navigation }) => {
             >
               <WebDisplay content={diary.content ? diary.content : source.html} />
               {diary.isLiked && <List.Icon color='#ff5353' style={styles.heart} icon="heart" />}
+              {diary.status === diaryStatus.public && <List.Icon style={styles.public} icon="share" />}
             </TouchableOpacity>
           </SharedElement>
           <View style={styles.title}>
@@ -201,6 +198,13 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.5 }],
     zIndex: 2,
     bottom: -15,
+    right: -15,
+  },
+  public: {
+    position: 'absolute',
+    transform: [{ scale: 0.5 }],
+    zIndex: 3,
+    top: -15,
     right: -15,
   },
 });
