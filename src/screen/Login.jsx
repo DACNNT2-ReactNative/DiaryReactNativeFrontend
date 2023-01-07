@@ -17,6 +17,7 @@ import { setAccessToken } from '../utils/token-config';
 import Loading from '../components/Loading';
 import * as Google from 'expo-auth-session/providers/google';
 import { passCodeValidator } from '../helpers/passCodeValidator';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
@@ -24,12 +25,13 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' });
   const [passCode, setPassCode] = useState({ value: '', error: '' });
   const [isSecure, setIsSecure] = useState(false);
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const [error, setError] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: '556329648016-t8h951d4t6jnbctfkk0ikm7cs9cuavsa.apps.googleusercontent.com',
-    // iosClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
-    // androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+    iosClientId: '556329648016-1ao777a0jeakbo85mg8ag70ckchvat64.apps.googleusercontent.com',
+    androidClientId: '556329648016-7da01oi0vpnkqn51t4qampk8in8qr6bk.apps.googleusercontent.com',
     // webClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
   });
 
@@ -59,7 +61,7 @@ export default function Login({ navigation }) {
     },
   );
 
-  const { mutate: loginGoogle, isLoadingGoogle } = useMutation(
+  const { mutate: loginGoogle, isLoadingLogin } = useMutation(
     (loginData) => {
       return axiosConfig.post('Authenticate/login-google', loginData);
     },
@@ -69,11 +71,11 @@ export default function Login({ navigation }) {
         const responseUser = await axiosConfig.get('Authenticate/decode-token', {
           headers: { jwttoken: response.data.token },
         });
+        setIsLoadingGoogle(false);
         dispatch(authActions.setUser(responseUser.data));
         dispatch(authActions.setAuthenticated(true));
       },
       onError: (error) => {
-        console.log('error login', error);
         if (error.status === 400) {
           setIsSecure(true);
         } else if (error.title) {
@@ -127,13 +129,11 @@ export default function Login({ navigation }) {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           loginGoogle({
             username: data.email,
             email: data.email,
             fullName: data?.name || data?.email,
           });
-          console.log(isLoadingGoogle);
         })
         .catch((error) => {
           console.error(error);
@@ -145,6 +145,11 @@ export default function Login({ navigation }) {
     <Background
       children={
         <>
+          <Spinner
+            visible={isLoadingGoogle}
+            textContent={'Đang đăng nhập...'}
+            textStyle={styles.spinnerTextStyle}
+          />
           {isSecure ? (
             <Portal>
               <Dialog
@@ -246,6 +251,7 @@ export default function Login({ navigation }) {
             mode="contained"
             disabled={!request}
             onPress={() => {
+              setIsLoadingGoogle(true);
               promptAsync();
             }}
             style={{
@@ -277,6 +283,9 @@ export default function Login({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  spinnerTextStyle: {
+    color: '#FFF',
+  },
   headers: {
     marginBottom: 20,
     top: 0,

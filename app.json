@@ -19,9 +19,12 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.diaryfrontend",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.diaryfrontend",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
@@ -29,6 +32,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e30dc022-25e0-4f02-affe-e497f616acee"
+      }
     }
   }
 }

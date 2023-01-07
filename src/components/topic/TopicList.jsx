@@ -10,6 +10,8 @@ import { topicSelectors } from '../../redux/topic/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
+import messaging, { firebase } from '@react-native-firebase/messaging';
+import { getFcmToken, requestUserPermission } from '../../utils/pushNotification';
 
 const screen = Dimensions.get('screen');
 
@@ -58,6 +60,11 @@ const TopicList = ({ navigation }) => {
       },
     },
   );
+
+  useEffect(() => {
+    requestUserPermission();
+    getFcmToken();
+  }, []);
 
   useEffect(() => {
     if (topicList) {
