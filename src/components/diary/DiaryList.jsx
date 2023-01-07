@@ -16,7 +16,7 @@ import Loading from '../Loading';
 
 const screen = Dimensions.get('screen');
 
-const DiaryList = ({ topic, navigation }) => {
+const DiaryList = ({ topic, searchKey, navigation }) => {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
@@ -30,9 +30,9 @@ const DiaryList = ({ topic, navigation }) => {
     ['diaries'],
     async () => {
       const response = await axiosConfig.get('Diary/get-diaries-by-topic-id', {
-        params: { topicId: topic.topicId },
+        params: { topicId: topic.topicId, searchKey: searchKey },
       });
-      //console.log('get diaries res', response.data);
+      console.log('get diaries res', response.data);
       return response.data;
     },
     {
@@ -55,7 +55,7 @@ const DiaryList = ({ topic, navigation }) => {
         }, 800);
       });
     }
-  }, [isFocused]);
+  }, [isFocused, searchKey]);
 
   useEffect(() => {
     if (diaryList) {

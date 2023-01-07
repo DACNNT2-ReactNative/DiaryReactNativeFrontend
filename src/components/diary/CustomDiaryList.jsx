@@ -22,7 +22,7 @@ import { diaryListType, diaryStatus } from '../../constants/diaryStatus';
 
 const screen = Dimensions.get('screen');
 
-const CustomDiaryList = ({ topic, navigation }) => {
+const CustomDiaryList = ({ topic, searchKey, navigation }) => {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
@@ -43,7 +43,7 @@ const CustomDiaryList = ({ topic, navigation }) => {
         url = 'Diary/get-shared-diaries-by-user-id';
       }
       const response = await axiosConfig.get(url, {
-        params: { userId: currentUser.userId },
+        params: { userId: currentUser.userId, searchKey: searchKey },
       });
       //console.log('get diaries res', response.data);
       return response.data;
@@ -60,8 +60,15 @@ const CustomDiaryList = ({ topic, navigation }) => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      diaries.map((diary) => {
+        setTimeout(() => {
+          if (!diary.content || diary.content === '') {
+            dispatch(diaryActions.removeDiaryFromList(diary));
+          }
+        }, 800);
+      });
     }
-  }, [isFocused]);
+  }, [isFocused, searchKey]);
 
   useEffect(() => {
     if (diaryList) {
