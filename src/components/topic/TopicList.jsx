@@ -10,8 +10,9 @@ import { topicSelectors } from '../../redux/topic/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
-import messaging, { firebase } from '@react-native-firebase/messaging';
 import { getFcmToken, requestUserPermission } from '../../utils/pushNotification';
+import { setDeviceToken } from '../../utils/deviceTokenConfig';
+import DeviceInfo from 'react-native-device-info';
 
 const screen = Dimensions.get('screen');
 
@@ -62,9 +63,25 @@ const TopicList = ({ navigation }) => {
   );
 
   useEffect(() => {
-    requestUserPermission();
-    getFcmToken();
+    saveFcmToken();
   }, []);
+
+  const saveFcmToken = async () => {
+    await requestUserPermission();
+    const fcmToken = await getFcmToken();
+    if (fcmToken) {
+      console.log('fcmToken', fcmToken);
+      const deviceName = await DeviceInfo.getDeviceName();
+      console.log('deviceName', deviceName);
+      const response = await axiosConfig.post('Device/create-device', {
+        userId: currentUser.userId,
+        deviceToken: fcmToken,
+        userAgent: deviceName,
+      });
+      await setDeviceToken(fcmToken);
+      return response.data;
+    }
+  };
 
   useEffect(() => {
     if (topicList) {

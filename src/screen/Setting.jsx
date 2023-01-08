@@ -4,18 +4,32 @@ import Button from '../components/Button';
 import { removeAccessToken } from '../utils/token-config';
 import { actions as authActions } from '../redux/authenticate/slice';
 import { actions as diaryActions } from '../redux/diary/slice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { diaryListType } from '../constants/diaryStatus';
 import { useIsFocused } from '@react-navigation/core';
 import { useEffect } from 'react';
+import { getDeviceToken } from '../utils/deviceTokenConfig';
+import axiosConfig from '../utils/axios';
+import { authenticationSelectors } from '../redux/authenticate/selector';
 
 function Setting({ route, navigation }) {
   const dispatch = useDispatch();
+  const currentUser = useSelector(authenticationSelectors.getCurrentUser);
   const isFocused = useIsFocused();
   const onLogoutPressed = async () => {
-    await removeAccessToken();
+    await removeDeviceToken();
     dispatch(authActions.setAuthenticated(false));
     dispatch(authActions.setUser(undefined));
+  };
+
+  const removeDeviceToken = async () => {
+    const deviceToken = await getDeviceToken();
+    console.log('deviceToken', deviceToken);
+    await axiosConfig.post('Device/delete-device', {
+      userId: currentUser.userId,
+      deviceToken: deviceToken,
+    });
+    await removeAccessToken();
   };
 
   useEffect(() => {
@@ -23,7 +37,7 @@ function Setting({ route, navigation }) {
       dispatch(diaryActions.setDiaries([]));
     }
   }, [isFocused]);
-  
+
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <Text>Setting Screen</Text>
