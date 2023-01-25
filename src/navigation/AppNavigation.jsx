@@ -17,6 +17,7 @@ import Setting from '../screen/Setting';
 import MainStackNavigator from './MainStack';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { useState } from 'react';
+import ForgotPassword from '../screen/ForgotPassword';
 
 const Tab = createBottomTabNavigator();
 const Stack = createSharedElementStackNavigator();
@@ -52,6 +53,7 @@ function AppNavigation() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         </Stack.Navigator>
       )}
     </NavigationContainer>

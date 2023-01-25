@@ -5,14 +5,12 @@ import { Menu, Paragraph } from 'react-native-paper';
 import { SharedElement } from 'react-navigation-shared-element';
 import { useQuery } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
+import { useDecodeToken } from '../../hooks/useDecodeToken';
 import { authenticationSelectors } from '../../redux/authenticate/selector';
 import { topicSelectors } from '../../redux/topic/selector';
 import { actions as topicActions } from '../../redux/topic/slice';
 import axiosConfig from '../../utils/axios';
 import Loading from '../Loading';
-import { getFcmToken, requestUserPermission } from '../../utils/pushNotification';
-import { setDeviceToken } from '../../utils/deviceTokenConfig';
-import DeviceInfo from 'react-native-device-info';
 
 const screen = Dimensions.get('screen');
 
@@ -27,6 +25,7 @@ const TopicList = ({ navigation }) => {
 
   const openMenu = () => setShowMenu(true);
   const closeMenu = () => setShowMenu(false);
+  const isDecodeToken = useDecodeToken();
 
   const onIconPress = (event) => {
     const { nativeEvent } = event;
@@ -61,27 +60,6 @@ const TopicList = ({ navigation }) => {
       },
     },
   );
-
-  useEffect(() => {
-    saveFcmToken();
-  }, []);
-
-  const saveFcmToken = async () => {
-    await requestUserPermission();
-    const fcmToken = await getFcmToken();
-    if (fcmToken) {
-      console.log('fcmToken', fcmToken);
-      const deviceName = await DeviceInfo.getDeviceName();
-      console.log('deviceName', deviceName);
-      const response = await axiosConfig.post('Device/create-device', {
-        userId: currentUser.userId,
-        deviceToken: fcmToken,
-        userAgent: deviceName,
-      });
-      await setDeviceToken(fcmToken);
-      return response.data;
-    }
-  };
 
   useEffect(() => {
     if (topicList) {

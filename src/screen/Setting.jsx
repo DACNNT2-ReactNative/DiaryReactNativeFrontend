@@ -40,7 +40,6 @@ function Setting({ route, navigation }) {
 
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <Text>Setting Screen</Text>
       <Button
         mode="contained"
         onPress={() => {
@@ -57,14 +56,28 @@ function Setting({ route, navigation }) {
       >
         Nhật ký đã chia sẻ
       </Button>
-      <Button
-        mode="contained"
-        onPress={() => {
-          navigation.navigate('PassCode');
-        }}
-      >
-        Mã bảo mật
-      </Button>
+      {currentUser.typeLogin === 'username' && (
+        <Button
+          mode="contained"
+          onPress={() => {
+            navigation.navigate('PassCode');
+          }}
+        >
+          Mã bảo mật
+        </Button>
+      )}
+
+      {currentUser.typeLogin === 'username' && (
+        <Button
+          mode="contained"
+          onPress={() => {
+            navigation.navigate('ChangePassword');
+          }}
+        >
+          Đổi mật khẩu
+        </Button>
+      )}
+
       <Button
         mode="contained"
         onPress={() => {

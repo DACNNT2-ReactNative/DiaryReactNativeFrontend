@@ -2,8 +2,7 @@ import axios from 'axios';
 import { getAccessToken } from './token-config';
 
 const axiosConfig = axios.create({
-  // baseURL: 'https://5aicueuw8h.execute-api.ap-southeast-1.amazonaws.com/Prod/api/',
-  baseURL: 'https://aca4-115-73-221-54.ap.ngrok.io/api/',
+  baseURL: 'https://5aicueuw8h.execute-api.ap-southeast-1.amazonaws.com/Prod/api/',
   headers: {
     'content-type': 'application/json',
   },

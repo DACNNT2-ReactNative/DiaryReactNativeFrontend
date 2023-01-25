@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { diaryListType } from '../constants/diaryStatus';
 import { actions as diaryActions } from '../redux/diary/slice';
 import { actions as topicActions } from '../redux/topic/slice';
+import ChangePassword from '../screen/ChangePassword';
 import DiaryEdit from '../screen/DiaryEdit';
 import DiaryList from '../screen/DiaryListScreen';
 import DiaryOption from '../screen/DiaryOption';
@@ -125,6 +126,13 @@ const MainStackNavigator = ({ route }) => {
         options={{ title: 'Mã bảo mật', unmountOnBlur: true }}
         component={PassCode}
       />
+
+      <Stack.Screen
+        name="ChangePassword"
+        options={{ title: 'Đổi mật khẩu', unmountOnBlur: true }}
+        component={ChangePassword}
+      />
+
       <Stack.Screen
         name="DiaryOption"
         options={{

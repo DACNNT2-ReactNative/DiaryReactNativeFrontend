@@ -18,6 +18,9 @@ import Loading from '../components/Loading';
 import * as Google from 'expo-auth-session/providers/google';
 import { passCodeValidator } from '../helpers/passCodeValidator';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { getFcmToken, requestUserPermission } from '../utils/pushNotification';
+import { setDeviceToken } from '../utils/deviceTokenConfig';
+import DeviceInfo from 'react-native-device-info';
 
 export default function Login({ navigation }) {
   const dispatch = useDispatch();
@@ -42,11 +45,7 @@ export default function Login({ navigation }) {
     {
       onSuccess: async (response) => {
         await setAccessToken(response.data.token);
-        const responseUser = await axiosConfig.get('Authenticate/decode-token', {
-          headers: { jwttoken: response.data.token },
-        });
-        dispatch(authActions.setUser(responseUser.data));
-        dispatch(authActions.setAuthenticated(true));
+        await saveFcmToken(response.data.token, response.data.userId);
       },
       onError: (error) => {
         console.log('error login', error);
@@ -61,13 +60,39 @@ export default function Login({ navigation }) {
     },
   );
 
+  const saveFcmToken = async (token, userId) => {
+    await requestUserPermission();
+    const fcmToken = await getFcmToken();
+    console.log('fcmToken', token);
+    if (fcmToken) {
+      console.log('fcmToken', fcmToken);
+      const deviceName = await DeviceInfo.getDeviceName();
+      console.log('deviceName', deviceName);
+      const response = await axiosConfig.post('Device/create-device', {
+        userId: userId,
+        deviceToken: fcmToken,
+        userAgent: deviceName,
+        accessToken: token,
+      });
+      console.log('response', response);
+      await setDeviceToken(fcmToken);
+      const responseUser = await axiosConfig.get('Authenticate/decode-token', {
+        headers: { jwttoken: token },
+      });
+      dispatch(authActions.setUser(responseUser.data));
+      dispatch(authActions.setAuthenticated(true));
+    }
+  };
+
   const { mutate: loginGoogle, isLoadingLogin } = useMutation(
     (loginData) => {
       return axiosConfig.post('Authenticate/login-google', loginData);
     },
     {
       onSuccess: async (response) => {
+        console.log('response', response.data);
         await setAccessToken(response.data.token);
+        await saveFcmToken(response.data.token, response.data.userId);
         const responseUser = await axiosConfig.get('Authenticate/decode-token', {
           headers: { jwttoken: response.data.token },
         });
@@ -226,7 +251,7 @@ export default function Login({ navigation }) {
           />
           {error ? <HelperText type="error">{error}</HelperText> : null}
           <View style={styles.forgotPassword}>
-            <TouchableOpacity onPress={() => navigation.replace('Register')}>
+            <TouchableOpacity onPress={() => navigation.replace('ForgotPassword')}>
               <Text style={styles.forgot}>Quên mật khẩu?</Text>
             </TouchableOpacity>
           </View>

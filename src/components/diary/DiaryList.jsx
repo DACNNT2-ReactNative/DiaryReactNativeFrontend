@@ -1,12 +1,20 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect } from 'react';
-import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { List, Paragraph } from 'react-native-paper';
 import RenderHTML from 'react-native-render-html';
 import { SharedElement } from 'react-navigation-shared-element';
 import { useQuery } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { diaryStatus } from '../../constants/diaryStatus';
+import { useDecodeToken } from '../../hooks/useDecodeToken';
 import { diarySelectors } from '../../redux/diary/selector';
 import { actions as diaryActions } from '../../redux/diary/slice';
 import axiosConfig from '../../utils/axios';
@@ -21,6 +29,8 @@ const DiaryList = ({ topic, searchKey, navigation }) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const diaries = useSelector(diarySelectors.getDiaries);
+
+  const isDecodeToken = useDecodeToken();
 
   const {
     data: diaryList,
@@ -144,8 +154,10 @@ const DiaryList = ({ topic, searchKey, navigation }) => {
               style={styles.listItem}
             >
               <WebDisplay content={diary.content ? diary.content : source.html} />
-              {diary.isLiked && <List.Icon color='#ff5353' style={styles.heart} icon="heart" />}
-              {diary.status === diaryStatus.public && <List.Icon style={styles.public} icon="share" />}
+              {diary.isLiked && <List.Icon color="#ff5353" style={styles.heart} icon="heart" />}
+              {diary.status === diaryStatus.public && (
+                <List.Icon style={styles.public} icon="share" />
+              )}
             </TouchableOpacity>
           </SharedElement>
           <View style={styles.title}>

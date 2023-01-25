@@ -14,11 +14,13 @@ import axiosConfig from '../utils/axios';
 import { useMutation } from 'react-query';
 import Loading from '../components/Loading';
 import BackButton from '../components/BackButton';
+import { emailValidator } from '../helpers/emailValidator';
 
 export default function Register({ navigation }) {
   const [username, setUsername] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
   const [fullName, setFullName] = useState({ value: '', error: '' });
+  const [email, setEmail] = useState({ value: '', error: '' });
 
   const { mutate: registerUser, isLoading } = useMutation(
     (registerData) => {
@@ -28,7 +30,7 @@ export default function Register({ navigation }) {
       onSuccess: (response) => {
         if (response.status === 200) {
           navigation.replace('Login');
-          Alert.alert('', 'Chúc mừng bạn đã đăng ký tài khoản thành công')
+          Alert.alert('', 'Chúc mừng bạn đã đăng ký tài khoản thành công');
         }
       },
       onError: (error) => {
@@ -42,16 +44,19 @@ export default function Register({ navigation }) {
     const userNameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
     const fullNameError = fullNameValidator(fullName.value);
+    const emailError = emailValidator(email.value);
     if (userNameError || passwordError || fullNameError) {
       setUsername({ ...username, error: userNameError });
       setPassword({ ...password, error: passwordError });
       setFullName({ ...fullName, error: fullNameError });
+      setEmail({ ...email, error: emailError });
       return;
     }
     const data = {
       username: username.value,
       password: password.value,
       fullName: fullName.value,
+      email: email.value,
     };
     registerUser(data);
   };
@@ -77,6 +82,19 @@ export default function Register({ navigation }) {
             textContentType="fullName"
             keyboardType="fullName"
           />
+
+          <TextInput
+            label="Email"
+            returnKeyType="next"
+            value={email.value}
+            onChangeText={(text) => setEmail({ value: text, error: '' })}
+            error={!!email.error}
+            errorText={email.error}
+            autoCapitalize="none"
+            autoCompleteType="email"
+            textContentType="email"
+            keyboardType="email"
+          />
           <TextInput
             label="Tên đăng nhập"
             returnKeyType="next"
@@ -100,7 +118,7 @@ export default function Register({ navigation }) {
           />
           <Button mode="contained" onPress={onRegisterPress} loading={isLoading}>
             Đăng kí
-          </Button>          
+          </Button>
 
           <View style={styles.row}>
             <Text>Bạn đã có tài khoản? </Text>
