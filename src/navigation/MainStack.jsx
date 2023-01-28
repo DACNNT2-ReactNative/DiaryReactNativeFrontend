@@ -109,7 +109,7 @@ const MainStackNavigator = ({ route }) => {
       />
       <Stack.Screen
         name="Setting"
-        options={{ title: 'Thông tin cá nhân', unmountOnBlur: true }}
+        options={{ title: 'Cài đặt chung', unmountOnBlur: true }}
         component={Setting}
       />
       <Stack.Screen

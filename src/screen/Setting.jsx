@@ -92,7 +92,7 @@ function Setting({ route, navigation }) {
           onLogoutPressed();
         }}
       >
-        Logout
+        Đăng xuất
       </Button>
     </View>
   );
