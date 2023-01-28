@@ -44,7 +44,7 @@ const DiaryListScreen = ({ route, navigation }) => {
           value={searchKey.value}
           onChangeText={(text) => setSearchKey({ value: text, error: '' })}
           autoCapitalize="none"
-          style={{ margin: 10, width: '90%', alignSelf: 'center', height: 40 }}
+          style={{ margin: 10, width: '90%', alignSelf: 'center', height: 50, fontSize: 18}}
         />
       )}
       {renderDiaryList(topic)}

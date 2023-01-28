@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from 'react-native';
-import { Dialog, Paragraph, Portal } from 'react-native-paper';
+import { Dialog, Divider, List, Paragraph, Portal } from 'react-native-paper';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import Button from '../components/Button';
@@ -197,17 +197,69 @@ export default function PassCode({ route, navigation }) {
           </Dialog>
         </Portal>
       )}
-      <Button mode="contained" style={styles.btn} onPress={onCreatePassCodePress}>
-        Đặt mã bảo mật
-      </Button>
-      <Button
-        mode="contained"
-        style={styles.btn}
-        onPress={onDeletePassCodePress}
-        disabled={isDisable}
-      >
-        Xóa mã bảo mật
-      </Button>
+      <List.Item
+        title="Đặt mã bảo mật"
+        onPress={onCreatePassCodePress}
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#69dd46',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#69dd46',
+              transform: [{ scale: 0.8 }],
+            }}
+          >
+            <List.Icon icon="key-plus" color="white" />
+          </View>
+        )}
+        titleStyle={{ fontSize: 18 }}
+      />
+      <Divider />
+      {isDisable ? (
+        <List.Item
+          disabled={isDisable}
+          title="Xóa mã bảo mật"
+          onPress={onDeletePassCodePress}
+          left={() => (
+            <View
+              style={{
+                backgroundColor: '#f33e3e',
+                borderRadius: 15,
+                borderWidth: 1,
+                borderColor: '#f33e3e',
+                transform: [{ scale: 0.8 }],
+              }}
+            >
+              <List.Icon icon="key-remove" color="white" />
+            </View>
+          )}
+          titleStyle={{ fontSize: 18 }}
+          style={{
+            opacity: 0.5,
+          }}
+        />
+      ) : (
+        <List.Item
+          title="Xóa mã bảo mật"
+          onPress={onDeletePassCodePress}
+          left={() => (
+            <View
+              style={{
+                backgroundColor: '#f33e3e',
+                borderRadius: 15,
+                borderWidth: 1,
+                borderColor: '#f33e3e',
+                transform: [{ scale: 0.8 }],
+              }}
+            >
+              <List.Icon icon="key-remove" color="white" />
+            </View>
+          )}
+          titleStyle={{ fontSize: 18 }}
+        />
+      )}
+      <Divider />
     </View>
   );
 }

@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { getDeviceToken } from '../utils/deviceTokenConfig';
 import axiosConfig from '../utils/axios';
 import { authenticationSelectors } from '../redux/authenticate/selector';
+import { Divider, List, Paragraph } from 'react-native-paper';
 
 function Setting({ route, navigation }) {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ function Setting({ route, navigation }) {
     await removeAccessToken();
   };
 
+  console.log(currentUser);
   useEffect(() => {
     if (isFocused) {
       dispatch(diaryActions.setDiaries([]));
@@ -39,61 +41,163 @@ function Setting({ route, navigation }) {
   }, [isFocused]);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center' }}>
-      <Button
-        mode="contained"
+    <View style={{ flex: 1 }}>
+      <View style={{ padding: 10, alignItems: 'center', flexDirection: 'row' }}>
+        <View
+          style={{
+            backgroundColor: '#ffffff',
+            borderRadius: 50,
+            borderWidth: 1,
+            borderColor: '#ffffff',
+            marginRight: 10,
+          }}
+        >
+          <List.Icon style={{transform: [{ scale: 1.5 }]}} icon="account" />
+        </View>
+        <Paragraph style={{ fontSize: 20, alignItems: 'center' }}>{currentUser.fullName}</Paragraph>
+      </View>
+      {currentUser.typeLogin === 'username' && (
+        <>
+          <View style={{ padding: 20, backgroundColor: '#c3c3c3', borderRadius: 5 }}>
+            <Paragraph style={{ fontSize: 18, alignItems: 'center' }}>Tài khoản</Paragraph>
+          </View>
+          <List.Item
+            title="Mã bảo mật"
+            onPress={() => {
+              navigation.navigate('PassCode');
+            }}
+            left={() => (
+              <View
+                style={{
+                  backgroundColor: '#7ade45',
+                  borderRadius: 15,
+                  borderWidth: 1,
+                  borderColor: '#7ade45',
+                  transform: [{ scale: 0.7 }],
+                }}
+              >
+                <List.Icon icon="key-variant" color="white" />
+              </View>
+            )}
+            right={() => <List.Icon icon="chevron-right" />}
+            titleStyle={{ fontSize: 18 }}
+          />
+          <Divider />
+          <List.Item
+            title="Đổi mật khẩu"
+            onPress={() => {
+              navigation.navigate('ChangePassword');
+            }}
+            left={() => (
+              <View
+                style={{
+                  backgroundColor: '#9f46df',
+                  borderRadius: 15,
+                  borderWidth: 1,
+                  borderColor: '#9f46df',
+                  transform: [{ scale: 0.7 }],
+                }}
+              >
+                <List.Icon icon="account-key" color="white" />
+              </View>
+            )}
+            right={() => <List.Icon icon="chevron-right" />}
+            titleStyle={{ fontSize: 18 }}
+          />
+        </>
+      )}
+      <View style={{ padding: 20, backgroundColor: '#c3c3c3', borderRadius: 5 }}>
+        <Paragraph style={{ fontSize: 18, alignItems: 'center' }}>Khác</Paragraph>
+      </View>
+      <List.Item
+        title="Nhật ký yêu thích"
         onPress={() => {
           navigation.navigate('DiaryList', { topic: diaryListType.favorite });
         }}
-      >
-        Nhật ký yêu thích
-      </Button>
-      <Button
-        mode="contained"
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#df465a',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#df465a',
+              transform: [{ scale: 0.7 }],
+            }}
+          >
+            <List.Icon icon="heart" color="white" />
+          </View>
+        )}
+        right={() => <List.Icon icon="chevron-right" />}
+        titleStyle={{ fontSize: 18 }}
+      />
+      <Divider />
+      <List.Item
+        title="Nhật ký đã chia sẻ"
         onPress={() => {
           navigation.navigate('DiaryList', { topic: diaryListType.shared });
         }}
-      >
-        Nhật ký đã chia sẻ
-      </Button>
-      {currentUser.typeLogin === 'username' && (
-        <Button
-          mode="contained"
-          onPress={() => {
-            navigation.navigate('PassCode');
-          }}
-        >
-          Mã bảo mật
-        </Button>
-      )}
-
-      {currentUser.typeLogin === 'username' && (
-        <Button
-          mode="contained"
-          onPress={() => {
-            navigation.navigate('ChangePassword');
-          }}
-        >
-          Đổi mật khẩu
-        </Button>
-      )}
-
-      <Button
-        mode="contained"
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#5046df',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#5046df',
+              transform: [{ scale: 0.7 }],
+            }}
+          >
+            <List.Icon icon="share" color="white" />
+          </View>
+        )}
+        right={() => <List.Icon icon="chevron-right" />}
+        titleStyle={{ fontSize: 18 }}
+      />
+      <Divider />
+      <List.Item
+        title="Cộng đồng"
         onPress={() => {
           navigation.navigate('DiaryList', { topic: diaryListType.public });
         }}
-      >
-        Cộng đồng
-      </Button>
-      <Button
-        mode="contained"
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#ec6749',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#ec6749',
+              transform: [{ scale: 0.7 }],
+            }}
+          >
+            <List.Icon icon="account-multiple" color="white" />
+          </View>
+        )}
+        right={() => <List.Icon icon="chevron-right" />}
+        titleStyle={{ fontSize: 18 }}
+      />
+      <Divider />
+      <Divider />
+      <List.Item
+        title="Đăng xuất"
         onPress={() => {
           onLogoutPressed();
         }}
-      >
-        Đăng xuất
-      </Button>
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#ee2626',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#ee2626',
+              transform: [{ scale: 0.7 }],
+            }}
+          >
+            <List.Icon icon="logout" color="white"/>
+          </View>
+        )}
+        right={() => <List.Icon icon="chevron-right" />}
+        titleStyle={{ fontSize: 18 }}
+      />
+      <Divider />
     </View>
   );
 }

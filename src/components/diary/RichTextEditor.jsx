@@ -165,7 +165,7 @@ const RichTextEditor = ({ diary, navigation }) => {
       <RichToolbar
         editor={richText}
         selectedIconTint="#fe4141"
-        iconTint="#e751d5"
+        iconTint="#000000"
         actions={[
           actions.fontSize,
           actions.fontSizeDown,
@@ -200,7 +200,7 @@ const RichTextEditor = ({ diary, navigation }) => {
       <RichToolbar
         editor={richText}
         selectedIconTint="#fe4141"
-        iconTint="#e751d5"
+        iconTint="#000000"
         actions={[
           actions.insertVideo,
           actions.insertImage,

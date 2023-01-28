@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
     marginTop: -150,
     marginLeft: 0,
     alignItems: 'center',
+    elevation: 0,
   },
   topic: {
     height: screen.width - 50,
