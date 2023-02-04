@@ -280,7 +280,7 @@ export default function Login({ navigation }) {
               promptAsync();
             }}
             style={{
-              backgroundColor: theme.colors.background,
+              backgroundColor: '#e63e3e',
               marginTop: 20,
               borderColor: '#E8F0F9',
               width: '100%',
@@ -289,7 +289,7 @@ export default function Login({ navigation }) {
               borderRadius: 15,
             }}
             labelStyle={{
-              color: '#BFBFBF',
+              color: '#e0e0e0',
               fontSize: 12,
             }}
           >

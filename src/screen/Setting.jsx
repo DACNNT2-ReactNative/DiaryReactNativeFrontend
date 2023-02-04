@@ -52,36 +52,37 @@ function Setting({ route, navigation }) {
             marginRight: 10,
           }}
         >
-          <List.Icon style={{transform: [{ scale: 1.5 }]}} icon="account" />
+          <List.Icon style={{ transform: [{ scale: 1.5 }] }} icon="account" />
         </View>
         <Paragraph style={{ fontSize: 20, alignItems: 'center' }}>{currentUser.fullName}</Paragraph>
       </View>
+
+      <View style={{ padding: 20, backgroundColor: '#c3c3c3', borderRadius: 5 }}>
+        <Paragraph style={{ fontSize: 18, alignItems: 'center' }}>Tài khoản</Paragraph>
+      </View>
+      <List.Item
+        title="Mã bảo mật"
+        onPress={() => {
+          navigation.navigate('PassCode');
+        }}
+        left={() => (
+          <View
+            style={{
+              backgroundColor: '#7ade45',
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#7ade45',
+              transform: [{ scale: 0.7 }],
+            }}
+          >
+            <List.Icon icon="key-variant" color="white" />
+          </View>
+        )}
+        right={() => <List.Icon icon="chevron-right" />}
+        titleStyle={{ fontSize: 18 }}
+      />
       {currentUser.typeLogin === 'username' && (
         <>
-          <View style={{ padding: 20, backgroundColor: '#c3c3c3', borderRadius: 5 }}>
-            <Paragraph style={{ fontSize: 18, alignItems: 'center' }}>Tài khoản</Paragraph>
-          </View>
-          <List.Item
-            title="Mã bảo mật"
-            onPress={() => {
-              navigation.navigate('PassCode');
-            }}
-            left={() => (
-              <View
-                style={{
-                  backgroundColor: '#7ade45',
-                  borderRadius: 15,
-                  borderWidth: 1,
-                  borderColor: '#7ade45',
-                  transform: [{ scale: 0.7 }],
-                }}
-              >
-                <List.Icon icon="key-variant" color="white" />
-              </View>
-            )}
-            right={() => <List.Icon icon="chevron-right" />}
-            titleStyle={{ fontSize: 18 }}
-          />
           <Divider />
           <List.Item
             title="Đổi mật khẩu"
@@ -191,7 +192,7 @@ function Setting({ route, navigation }) {
               transform: [{ scale: 0.7 }],
             }}
           >
-            <List.Icon icon="logout" color="white"/>
+            <List.Icon icon="logout" color="white" />
           </View>
         )}
         right={() => <List.Icon icon="chevron-right" />}
